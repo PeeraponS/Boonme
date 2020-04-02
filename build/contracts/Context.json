@@ -8,12 +8,12 @@
       "type": "constructor"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/12-3-2020/contracts/Context.sol\":\"Context\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/12-3-2020/contracts/Context.sol\":{\"keccak256\":\"0xeeb47984eb51ce342a1b81c1b0e1f3f5e1d252fdb4c8a3e879a5931cf7044065\",\"urls\":[\"bzz-raw://5e674bd011a9b33a43ea643d6a9ee74fdaa4b1ea91b952202b1d249f19898a70\",\"dweb:/ipfs/Qmbs2ddRRYzFw1U8GvHBTSK1C89esp9i37pehVY7qrmuwk\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/12-3-2020/contracts/Context.sol\":\"Context\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/12-3-2020/contracts/Context.sol\":{\"keccak256\":\"0x39c7b0cf136308f41b93ffd68a9603e089cffdb0266ec693e98c65178a7d34d0\",\"urls\":[\"bzz-raw://fa42324de0401979c437e016a1393d782c2fda0f2990ce3954c4a420a1141f03\",\"dweb:/ipfs/Qmezxhk15aMfVdztrmw3682Duwjmx4UvHjS6XyVfGrEuKt\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.5.0;\n\ncontract Context {\n    // Empty internal constructor, to prevent people from mistakenly deploying\n    // an instance of this contract, which should be used via inheritance.\n    constructor () internal { }\n    // solhint-disable-previous-line no-empty-blocks\n\n    function _msgSender() internal view returns (address payable) {\n        return msg.sender;\n    }\n\n    function _msgData() internal view returns (bytes memory) {\n        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691\n        return msg.data;\n    }\n}\n",
+  "source": "pragma solidity ^0.5.0;\n\n\ncontract Context {\n    // Empty internal constructor, to prevent people from mistakenly deploying\n    // an instance of this contract, which should be used via inheritance.\n    constructor() internal {}\n\n    // solhint-disable-previous-line no-empty-blocks\n\n    function _msgSender() internal view returns (address payable) {\n        return msg.sender;\n    }\n\n    function _msgData() internal view returns (bytes memory) {\n        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691\n        return msg.data;\n    }\n}\n",
   "sourcePath": "D:\\12-3-2020\\contracts\\Context.sol",
   "ast": {
     "absolutePath": "/D/12-3-2020/contracts/Context.sol",
@@ -53,7 +53,7 @@
             "body": {
               "id": 4,
               "nodeType": "Block",
-              "src": "226:3:0",
+              "src": "226:2:0",
               "statements": []
             },
             "documentation": null,
@@ -76,7 +76,7 @@
               "src": "226:0:0"
             },
             "scope": 26,
-            "src": "202:27:0",
+            "src": "203:25:0",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "internal"
@@ -292,7 +292,7 @@
           }
         ],
         "scope": 27,
-        "src": "25:589:0"
+        "src": "26:588:0"
       }
     ],
     "src": "0:615:0"
@@ -335,7 +335,7 @@
             "body": {
               "id": 4,
               "nodeType": "Block",
-              "src": "226:3:0",
+              "src": "226:2:0",
               "statements": []
             },
             "documentation": null,
@@ -358,7 +358,7 @@
               "src": "226:0:0"
             },
             "scope": 26,
-            "src": "202:27:0",
+            "src": "203:25:0",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "internal"
@@ -574,7 +574,7 @@
           }
         ],
         "scope": 27,
-        "src": "25:589:0"
+        "src": "26:588:0"
       }
     ],
     "src": "0:615:0"
@@ -585,7 +585,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-04-02T08:36:10.729Z",
+  "updatedAt": "2020-04-02T09:38:25.667Z",
   "devdoc": {
     "methods": {}
   },
