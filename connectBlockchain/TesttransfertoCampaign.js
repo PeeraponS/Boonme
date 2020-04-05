@@ -9,7 +9,7 @@ const web3 = new Web3(endPointUrl);
 
 
 const contractABI = require("/12-3-2020/build/contracts/Token.json")
-var contractAddress = '0x781ef4089546DAB8BA04734061327a8Fa8764c12'
+var contractAddress = '0xE4289B1DdDc2d8F678c4431C240A9940f0B69e70'
 
 
 const transfertoCampaign = async (myAddress, privateKeyOne, campaignAddress, maxamount, releaseTime, transferAmount) => {
@@ -56,12 +56,12 @@ const transfertoCampaign = async (myAddress, privateKeyOne, campaignAddress, max
 
 var myAddress = "0x9DBd4ECf641a51b741724D1078032E6F03F00a73"
 const privateKeyOne = Buffer.from("7FA12852860D12815DF6FC120D7DF6EDC7029223E0B8725995FBCCE4F4F071CE", "hex");
-var campaignAddress = '0xE6DDDf979582a24Dd97E30b8034B30AA26D74cd9'
-//campaignAddress =  Address ของ smartcontract campaign
-// 0x4E3f6f0cD87729C18A998A38128787bA0948413D,0x367eBdEB73Bb9A53f58D5e46b7fc4D6cAD6Acf67,0xa4499d6Fb2CD019434d69ef4a3EFD32A2AE2060c,0x9d94393047c4a06d6e85134752D2E234355650C5
-//0xE6DDDf979582a24Dd97E30b8034B30AA26D74cd9
+var campaignAddress = '0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7'
+//adress campaign = 
+//          [0]   = 0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7
+
 var maxamount = 10000;
 var transferAmount = 5000;
-var releaseTime = 1586076922;
+var releaseTime = 1586083258;
 
 transfertoCampaign(myAddress, privateKeyOne, campaignAddress, maxamount, releaseTime, transferAmount)

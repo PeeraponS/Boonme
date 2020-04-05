@@ -11,10 +11,10 @@ const privateKeyOne = Buffer.from("7FA12852860D12815DF6FC120D7DF6EDC7029223E0B87
 
 
 const contractABI = require("/12-3-2020/build/contracts/TimelockFactory.json") 
-var contractAddress = '0xD26eA93161682E25Be07338236462185fA711961'
-//contracttest1 = "0x28CAF7057f7802Ba203aDfB475657993e650E2Dd"
-//contracttest2 = "0xD5b7b65DbB264374f464911971A300C0d74B34B7"
-//contracttest3 = "0xD26eA93161682E25Be07338236462185fA711961"
+var contractAddress = '0x48D127F36B48aFBd2E9A22001437644C393158F9'
+//contracttest1 = "0xD26eA93161682E25Be07338236462185fA711961"
+//contracttest2 = "0x48D127F36B48aFBd2E9A22001437644C393158F9"
+
 
 //_token, _nameCampaign, _beneficiary, _releaseTime, _maxamount
 
@@ -87,18 +87,17 @@ const findCampaign = async choosedorderCampaign => {
 
 
 
-    var _token = "0x781ef4089546DAB8BA04734061327a8Fa8764c12";
-    var _nameCampaign = "Test9";
+    var _token = "0xE4289B1DdDc2d8F678c4431C240A9940f0B69e70";
+    var _nameCampaign = "Test1";
     var _beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
-    var _releaseTime = "1586076922"
+    var _releaseTime = "1586083258"
     var _maxamount = "10000";
 
 // createCampaign( _token, _nameCampaign, _beneficiary, _releaseTime, _maxamount);
 getDeployed();
 // findCampaign(0);
 
-
-//0x4E3f6f0cD87729C18A998A38128787bA0948413D,0x367eBdEB73Bb9A53f58D5e46b7fc4D6cAD6Acf67,0xa4499d6Fb2CD019434d69ef4a3EFD32A2AE2060c,0x9d94393047c4a06d6e85134752D2E234355650C5,0xE6DDDf979582a24Dd97E30b8034B30AA26D74cd9
-
+//adress campaign = 
+//          [0]   = 0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7
 
 

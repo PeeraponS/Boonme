@@ -10,7 +10,7 @@ const web3 = new Web3(endPointUrl);
 
 
 const contractABI = require("/12-3-2020/build/contracts/Token.json")
-var contractAddress = '0x781ef4089546DAB8BA04734061327a8Fa8764c12'
+var contractAddress = '0xE4289B1DdDc2d8F678c4431C240A9940f0B69e70'
 
 
 const transferto = async (myAddress, privateKeyOne, addressTwo, transferAmount) => {
@@ -51,7 +51,7 @@ const transferto = async (myAddress, privateKeyOne, addressTwo, transferAmount) 
   console.log("Receipt info: " + JSON.stringify(receipt, null));
   
   var balance = await contract.methods.balanceOf(myAddress).call();
-  var balanceTwo = await contract.methods.balanceOf(toAddress).call();
+  var balanceTwo = await contract.methods.balanceOf(addressTwo).call();
   console.log("Balance after send: " + balance);
   console.log("Balance of addressTwo " + balanceTwo)
   
@@ -61,6 +61,7 @@ var myAddress = "0x9DBd4ECf641a51b741724D1078032E6F03F00a73"
 const privateKeyOne = Buffer.from("7FA12852860D12815DF6FC120D7DF6EDC7029223E0B8725995FBCCE4F4F071CE", "hex");
 var toAddress = "0xB1e379A0e35382cd579Ae8f181C1ff21B112a6C9"
 const privateKeyTwo = Buffer.from("83a0081abc7ef41202bb691ccb6de8e34677a763fad5cae57fbdb9c0e3803964", "hex");
-var transferAmount = 500;
+var transferAmount = 5000;
+var addressCampaign = "0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7"
 
-transferto(myAddress, privateKeyOne, toAddress ,transferAmount)
+transferto(myAddress, privateKeyOne, addressCampaign ,transferAmount)

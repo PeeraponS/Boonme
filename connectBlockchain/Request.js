@@ -14,7 +14,7 @@ const privateKeyOne = Buffer.from("7FA12852860D12815DF6FC120D7DF6EDC7029223E0B87
 
 
 
-const release = async contractAddress => {
+const releaseAmount = async (contractAddress, transferAmount) => {
     var balance = await web3.eth.getBalance(myAddress);
 
 	console.log("Balance ETH: " + balance);
@@ -39,7 +39,7 @@ const release = async contractAddress => {
     "gasLimit": web3.utils.toHex(gasLimit),
     "to": contractAddress,
     "value": "0x0",
-    "data": contract.methods.release().encodeABI(),
+    "data": contract.methods.releaseAmount(transferAmount).encodeABI(),
     "chainId": chainId
 };
 
@@ -62,5 +62,6 @@ var contractAddress = '0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7'
 //adress campaign = 
 //          [0]   = 0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7
 
+var transferAmount = 5000;
 
-release(contractAddress)
+releaseAmount(contractAddress, transferAmount)
