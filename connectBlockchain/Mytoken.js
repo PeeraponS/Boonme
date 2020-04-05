@@ -6,9 +6,8 @@ console.log(chalk.blue(`Endpoint: ${endPointUrl}`));
 const web3 = new Web3(endPointUrl);
 
 const contractABI = require("/12-3-2020/build/contracts/Token.json")
-const contractAddress = "0xfD27b1E2A8e8c1121406cb4b0eFE6cf2aC98DE3f";
-//contracttest1 = "0x940c40Ed8d660e13bb8D4A67f86fcE04f2A93dD6"
-//contracttest2 = "0xfD27b1E2A8e8c1121406cb4b0eFE6cf2aC98DE3f"
+const contractAddress = "0x781ef4089546DAB8BA04734061327a8Fa8764c12";
+
 
 const contract = new web3.eth.Contract(contractABI.abi, contractAddress)
 
@@ -89,4 +88,4 @@ var addressRecipient = "0xB1e379A0e35382cd579Ae8f181C1ff21B112a6C9";
     // checkSymbol()
     // checkDecimals()
     // totalSupply()
-    checkBalance("0xa4499d6Fb2CD019434d69ef4a3EFD32A2AE2060c")
+    checkBalance("0xE6DDDf979582a24Dd97E30b8034B30AA26D74cd9")
