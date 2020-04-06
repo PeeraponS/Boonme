@@ -7,12 +7,12 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      trim: true
+      trim: true,
     },
     username: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     email: {
       type: String,
@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
         if (!validator.isEmail(value)) {
           throw new Error("Email is invalid.");
         }
-      }
+      },
     },
     password: {
       type: String,
@@ -34,12 +34,12 @@ const userSchema = new mongoose.Schema(
         if (value.toLowerCase() === "password") {
           throw new Error("Password can't contain 'password'");
         }
-      }
+      },
     },
     userpin: {
       type: String,
       minlength: 4,
-      trim: true
+      trim: true,
     },
     age: {
       type: Number,
@@ -48,15 +48,15 @@ const userSchema = new mongoose.Schema(
         if (value < 0) {
           throw new Error("Age must be positive number");
         }
-      }
+      },
     },
     tokens: [
       {
         token: {
           type: String,
-          required: true
-        }
-      }
+          required: true,
+        },
+      },
     ],
     goodcoin: {
       type: Number,
@@ -65,7 +65,7 @@ const userSchema = new mongoose.Schema(
         if (value < 0) {
           throw new Error("goodcoin must be positive number");
         }
-      }
+      },
     },
     cash: {
       type: Number,
@@ -74,11 +74,14 @@ const userSchema = new mongoose.Schema(
         if (value < 0) {
           throw new Error("cash must be positive number");
         }
-      }
-    }
+      },
+    },
+    bc_account: {
+      type: Object,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
@@ -87,11 +90,11 @@ const userSchema = new mongoose.Schema(
 userSchema.virtual("projects", {
   ref: "Project",
   localField: "_id", //_id of user
-  foreignField: "creator"
+  foreignField: "creator",
 });
 
 // this method will called automatically when the object is passed to JSON.stringify
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
 
@@ -102,13 +105,13 @@ userSchema.methods.toJSON = function() {
 };
 
 // instance method
-userSchema.methods.generateAuthToken = async function() {
+userSchema.methods.generateAuthToken = async function () {
   const user = this;
 
   // get token
   const token = jwt.sign({ _id: user._id.toString() }, "thisismynewcourse");
   user.tokens = user.tokens.concat({
-    token
+    token,
   });
 
   // return token;
@@ -118,7 +121,7 @@ userSchema.methods.generateAuthToken = async function() {
 // model method
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({
-    email
+    email,
   });
   if (!user) throw new Error("Unable to login");
   const isMatch = await bcrypt.compare(password, user.password);
@@ -127,7 +130,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
 };
 
 // middle ware before
-userSchema.pre("save", async function(next) {
+userSchema.pre("save", async function (next) {
   // edit some variable before saving to the mongoDb
   const user = this;
   if (user.isModified("password")) {

@@ -1,4 +1,5 @@
 // this file is starting point.
+require("dotenv").config();
 const express = require("express");
 require("./db/mongoose");
 
