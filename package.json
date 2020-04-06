@@ -14,9 +14,17 @@
   "dependencies": {
     "@openzeppelin/contracts": "^2.5.0",
     "@truffle/hdwallet-provider": "^1.0.32",
+    "axios": "^0.19.2",
+    "bcrypt": "^4.0.1",
     "chalk": "^3.0.0",
     "darq-truffle": "^4.1.8",
     "ethereumjs-tx": "^2.1.2",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.7",
+    "multer": "^1.4.2",
+    "sha256": "^0.2.0",
+    "validator": "^13.0.0",
     "web3": "^1.2.6"
   }
 }
