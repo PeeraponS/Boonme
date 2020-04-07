@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const {
+  create_encrypted_account,
+} = require("../../connectBlockchain/CreateAccounts");
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -102,6 +106,17 @@ userSchema.methods.toJSON = function () {
   delete userObject.tokens;
 
   return userObject;
+};
+
+// instance method
+userSchema.methods.generateBlockchainAccount = async function () {
+  const user = this;
+
+  bc_account = await create_encrypted_account();
+  user.bc_account = bc_account;
+
+  // return token;
+  return bc_account;
 };
 
 // instance method

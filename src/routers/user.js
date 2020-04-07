@@ -9,6 +9,7 @@ router.post("/users", async (req, res) => {
   try {
     const user = new User(req.body);
 
+    await user.generateBlockchainAccount();
     await user.generateAuthToken();
     await user.save();
     res.status(201).send(user);
@@ -19,7 +20,9 @@ router.post("/users", async (req, res) => {
 
 router.post("/users/logout", auth, async (req, res) => {
   try {
-    req.user.tokens = req.user.tokens.filter(token => token.token != req.token);
+    req.user.tokens = req.user.tokens.filter(
+      (token) => token.token != req.token
+    );
     await req.user.save();
     res.send(200).send();
   } catch (err) {
@@ -75,7 +78,7 @@ router.patch("/users/:id", async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "password", "age"];
-  const isValidOperation = updates.every(update => {
+  const isValidOperation = updates.every((update) => {
     return allowedUpdates.includes(update);
   });
   if (!isValidOperation) {
@@ -84,7 +87,7 @@ router.patch("/users/:id", async (req, res) => {
 
   try {
     const user = await User.findById(req.params.id);
-    updates.forEach(key => (user[key] = req.body[key]));
+    updates.forEach((key) => (user[key] = req.body[key]));
     user.save();
 
     if (!user) {
@@ -101,7 +104,7 @@ router.patch("/users/:id/updatepin", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
   const allowedUpdates = ["userpin"];
-  const isValidOperation = updates.every(update => {
+  const isValidOperation = updates.every((update) => {
     return allowedUpdates.includes(update);
   });
   if (!isValidOperation) {
@@ -110,14 +113,14 @@ router.patch("/users/:id/updatepin", auth, async (req, res) => {
 
   try {
     const user = await User.findById(req.params.id);
-    updates.forEach(key => {
+    updates.forEach((key) => {
       user[key] = req.body[key];
     });
     await user.save();
 
     if (!user) {
       return res.status(404).send({
-        dataSent: req.params
+        dataSent: req.params,
       });
     }
 
@@ -137,7 +140,7 @@ router.delete("/users/me", auth, async (req, res) => {
 });
 
 const upload = multer({
-  dest: "avatars"
+  dest: "avatars",
 });
 router.post("/users/me/uploadavatar", upload.single("avatar"), (req, res) => {
   console.log("something went");
