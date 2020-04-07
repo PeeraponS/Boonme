@@ -1,15 +1,14 @@
 const Web3 = require("web3");
-const chalk = require("chalk");
-const url = "https://localhost:8546";
-const infura = "https://rinkeby.infura.io/v3/991d6c0c5fd54ee4bac60feed128dffd";
 const web3 = new Web3(Web3.givenProvider || infura);
+const chalk = require("chalk");
 
+const infura = "https://rinkeby.infura.io/v3/991d6c0c5fd54ee4bac60feed128dffd";
+const url = "https://localhost:8546";
 
 const createAccount = async () => {
   var create = await web3.eth.accounts.create(["this is my seed phrase"]);
   console.log(chalk.greenBright(JSON.stringify(create, null)));
 };
-
 
 const createAccounts = async (quantity) => {
   var arr = [];
@@ -23,22 +22,20 @@ const createAccounts = async (quantity) => {
   console.log(chalk.greenBright(JSON.stringify(create, null)));
 };
 
-
 const privateKeyToAccount = async (privatekey) => {
   var toAccount = await web3.eth.accounts.privateKeyToAccount(privatekey);
   console.log(chalk.greenBright(JSON.stringify(toAccount, null)));
 };
 
-
 const encrypt = async (privateKey, password) => {
-    var encrypt = await web3.eth.accounts.encrypt(privateKey, password);
-    console.log(chalk.greenBright(JSON.stringify(encrypt, null)))
-}
+  var encrypt = await web3.eth.accounts.encrypt(privateKey, password);
+  console.log(chalk.greenBright(JSON.stringify(encrypt, null)));
+};
 
 const decrypt = async (keystoreJsonV3, password) => {
-    var decrypt = await web3.eth.accounts.decrypt(keystoreJsonV3, password);
-    console.log(chalk.greenBright(JSON.stringify(decrypt, null)))
-}
+  var decrypt = await web3.eth.accounts.decrypt(keystoreJsonV3, password);
+  console.log(chalk.greenBright(JSON.stringify(decrypt, null)));
+};
 
 // createAccount();
 // createAccounts(10);
