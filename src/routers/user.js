@@ -137,10 +137,52 @@ router.delete("/users/me", auth, async (req, res) => {
 });
 
 const upload = multer({
-  dest: "avatars",
+  limits: {
+    fileSize: 1000000,
+  },
+  fileFilter(req, file, callback) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return callback(new Error("Please upload an image"));
+    }
+
+    // callback(new Error('plase upload an image'))
+    callback(undefined, true);
+  },
 });
-router.post("/users/me/uploadavatar", upload.single("avatar"), (req, res) => {
-  res.send("200");
+router.post(
+  "/users/me/uploadavatar",
+  auth,
+  upload.single("avatar"),
+  async (req, res) => {
+    // access file upload and assign to avatar
+    req.user.avatar = req.file.buffer;
+    await req.user.save();
+    res.send();
+  },
+  (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+  }
+);
+
+router.delete("/users/me/uploadavatar", auth, async (req, res) => {
+  req.user.avatar = undefined;
+  await req.user.save();
+  res.send();
+});
+
+// use
+router.get("/users/:id/avatar", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || !user.avatar) {
+      throw new Error();
+    }
+    res.set("Content-Type", "image/jpg");
+    res.send(user.avatar);
+  } catch (error) {
+    res.status(404).send();
+  }
 });
 
 module.exports = router;

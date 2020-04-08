@@ -9,15 +9,6 @@ const {
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      trim: true,
-    },
-    username: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     email: {
       type: String,
       required: true,
@@ -28,6 +19,12 @@ const userSchema = new mongoose.Schema(
           throw new Error("Email is invalid.");
         }
       },
+    },
+
+    username: {
+      type: String,
+      required: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -45,6 +42,18 @@ const userSchema = new mongoose.Schema(
       minlength: 4,
       trim: true,
     },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    name: {
+      type: String,
+      trim: true,
+    },
     age: {
       type: Number,
       default: 0,
@@ -54,14 +63,6 @@ const userSchema = new mongoose.Schema(
         }
       },
     },
-    tokens: [
-      {
-        token: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
     goodcoin: {
       type: Number,
       default: 0,
@@ -79,6 +80,9 @@ const userSchema = new mongoose.Schema(
           throw new Error("cash must be positive number");
         }
       },
+    },
+    avatar: {
+      type: Buffer,
     },
     bc_account: {
       type: Object,
