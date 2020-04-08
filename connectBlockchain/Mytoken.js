@@ -6,7 +6,7 @@ const endPointUrl =
 console.log(chalk.blue(`Endpoint: ${endPointUrl}`));
 const web3 = new Web3(endPointUrl);
 
-const contractABI = require("/12-3-2020/build/contracts/Token.json");
+const contractABI = require("../build/contracts/Token.json");
 const contractAddress = "0xE4289B1DdDc2d8F678c4431C240A9940f0B69e70";
 
 const contract = new web3.eth.Contract(contractABI.abi, contractAddress);
@@ -55,9 +55,10 @@ const checkBalance = async (choosedAccount) => {
   // Check Balance
   const contract = new web3.eth.Contract(contractABI.abi, contractAddress);
   try {
-    contract.methods.balanceOf(choosedAccount).call((err, result) => {
+    return contract.methods.balanceOf(choosedAccount).call((err, result) => {
       if (err) console.log(chalk.red(err));
-      else console.log(chalk.yellow(result));
+      // else console.log(chalk.yellow(result));
+      else return result;
     });
   } catch (err) {
     console.log(err.message);
@@ -83,7 +84,7 @@ var addressRecipient = "0xB1e379A0e35382cd579Ae8f181C1ff21B112a6C9";
 // checkSymbol()
 // checkDecimals()
 // totalSupply()
-checkBalance("0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7");
+// checkBalance("0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7");
 
 module.exports = {
   checkBalance,

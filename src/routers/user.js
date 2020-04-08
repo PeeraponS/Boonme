@@ -1,8 +1,10 @@
 const express = require("express");
 const router = new express.Router();
+const multer = require("multer");
+
 const User = require("../models/user");
 const auth = require("../middleWare/auth");
-const multer = require("multer");
+const { checkBalance } = require("../../connectBlockchain/Mytoken");
 
 router.post("/users", async (req, res) => {
   try {
@@ -69,6 +71,15 @@ router.post("/users/:id/buytoken", auth, async (req, res) => {
 
 router.get("/users/me", auth, async (req, res) => {
   res.send(req.user);
+});
+
+router.get("/users/goodcoin", auth, async (req, res) => {
+  const bc_address = req.user.bc_account.address;
+  const balance = await checkBalance(bc_address);
+
+  res.send({
+    goodcoin_balance: parseInt(balance, 10),
+  });
 });
 
 router.patch("/users/:id", async (req, res) => {
