@@ -9,8 +9,11 @@ const web3 = new Web3(endPointUrl);
 
 
 const contractABI = require("/12-3-2020/build/contracts/TimelockToken.json")
-var myAddress = "0x9DBd4ECf641a51b741724D1078032E6F03F00a73"
-const privateKeyOne = Buffer.from("7FA12852860D12815DF6FC120D7DF6EDC7029223E0B8725995FBCCE4F4F071CE", "hex");
+var myAddress = process.env.MANAGER_ADDRESS;
+const privateKeyOne = Buffer.from(
+  process.env.MANAGER_PRIVATEKEY,
+  "hex"
+);
 
 
 
