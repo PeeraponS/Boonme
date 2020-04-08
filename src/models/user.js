@@ -108,20 +108,10 @@ userSchema.methods.toJSON = function () {
 
   delete userObject.password;
   delete userObject.tokens;
+  delete userObject.avatar;
 
   return userObject;
 };
-
-// // instance method
-// userSchema.methods.generateBlockchainAccount = async function () {
-//   const user = this;
-
-//   bc_account = await create_encrypted_account(password);
-//   user.bc_account = bc_account;
-
-//   // return token;
-//   return bc_account;
-// };
 
 // instance method
 userSchema.methods.generateAuthToken = async function () {
