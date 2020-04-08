@@ -7,7 +7,7 @@ router.post("/projects", auth, async (req, res) => {
   // const project = new Project(req.body);
   const project = new Project({
     ...req.body,
-    creator: req.user._id
+    creator: req.user._id,
   });
 
   try {
@@ -18,12 +18,20 @@ router.post("/projects", auth, async (req, res) => {
   }
 });
 
-// GET /projects/own?complete=true
-// GET /projects/own?limit=number&skip=number
-router.get("/projects/", async (req, res) => {
+// GET /projects/?complete=true
+// GET /projects/?limit=number&skip=number
+// GET /projects/?project_type=project_type
+router.get("/projects", async (req, res) => {
   // 50%, no filter
+  let query = {};
+  if (req.query.project_type) {
+    query = {
+      project_type: req.query.project_type,
+    };
+  }
+
   try {
-    const projects = await Project.find({});
+    const projects = await Project.find(query);
     res.send(projects);
   } catch (error) {
     res.status(500).send(error);
@@ -54,8 +62,8 @@ router.get("/projects/own", auth, async (req, res) => {
         options: {
           limit: parseInt(req.query.limit),
           skip: parseInt(req.query.skip),
-          sort
-        }
+          sort,
+        },
       })
       .execPopulate();
     res.send(req.user.projects);
@@ -89,7 +97,7 @@ router.patch("/projects/:id", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
   const allowedUpdates = ["description", "completed", "name"];
-  const isValidOperation = updates.every(update => {
+  const isValidOperation = updates.every((update) => {
     return allowedUpdates.includes(update);
   });
   if (!isValidOperation) {
@@ -99,13 +107,13 @@ router.patch("/projects/:id", auth, async (req, res) => {
   try {
     const project = await Project.findOne({
       _id: req.params.id,
-      creator: req.user._id
+      creator: req.user._id,
     });
 
     if (!project) {
       return res.status(404).send();
     }
-    updates.forEach(key => (project[key] = req.body[key]));
+    updates.forEach((key) => (project[key] = req.body[key]));
     project.save();
     res.send(project);
   } catch (error) {
@@ -117,7 +125,7 @@ router.delete("/projects/:id", auth, async (req, res) => {
   try {
     const project = await Project.findByIdAndDelete({
       _id: req.params.id,
-      creator: req.user._id
+      creator: req.user._id,
     });
 
     if (!project) {
