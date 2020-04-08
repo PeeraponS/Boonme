@@ -1,4 +1,8 @@
 const mongoose = require("mongoose");
+const sha256 = require("sha256");
+const {
+  create_encrypted_account,
+} = require("../../connectBlockchain/CreateAccounts");
 const projectSchema = new mongoose.Schema(
   {
     name: {
@@ -47,8 +51,13 @@ const projectSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    address_blockchain: {
+    bc_account: {
+      type: Object,
+    },
+    password_blockchain: {
       type: String,
+      minlength: 6,
+      trim: true,
     },
     donation_recipients_blockchain: [
       {
@@ -69,6 +78,24 @@ const projectSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// middle ware before
+projectSchema.pre("save", async function (next) {
+  // edit some variable before saving to the mongoDb
+  const project = this;
+  const password_blockchain = await sha256.x2(
+    process.env.DUMMIE_PROJECT_PASSWORD
+  );
+
+  // create blockchain account
+  bc_account = await create_encrypted_account(password_blockchain);
+  project.bc_account = bc_account;
+  project.password_blockchain = password_blockchain;
+
+  // tell that finish operation
+  next();
+});
+
 const Project = mongoose.model("Project", projectSchema);
 
 module.exports = Project;
