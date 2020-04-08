@@ -1,6 +1,6 @@
 const validator = require("validator");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const sha256 = require("sha256");
 const jwt = require("jsonwebtoken");
 
 const {
@@ -108,16 +108,16 @@ userSchema.methods.toJSON = function () {
   return userObject;
 };
 
-// instance method
-userSchema.methods.generateBlockchainAccount = async function () {
-  const user = this;
+// // instance method
+// userSchema.methods.generateBlockchainAccount = async function () {
+//   const user = this;
 
-  bc_account = await create_encrypted_account();
-  user.bc_account = bc_account;
+//   bc_account = await create_encrypted_account(password);
+//   user.bc_account = bc_account;
 
-  // return token;
-  return bc_account;
-};
+//   // return token;
+//   return bc_account;
+// };
 
 // instance method
 userSchema.methods.generateAuthToken = async function () {
@@ -139,8 +139,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
     email,
   });
   if (!user) throw new Error("Unable to login");
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new Error("Unable to login");
+  if (sha256.x2(password) !== user.password) throw new Error("Unable to login");
   return user;
 };
 
@@ -148,9 +147,15 @@ userSchema.statics.findByCredentials = async (email, password) => {
 userSchema.pre("save", async function (next) {
   // edit some variable before saving to the mongoDb
   const user = this;
+
+  // encrypt password
   if (user.isModified("password")) {
-    user.password = await bcrypt.hash(user.password, 8);
+    user.password = await sha256.x2(user.password);
   }
+
+  // create blockchain account
+  bc_account = await create_encrypted_account(user.password);
+  user.bc_account = bc_account;
 
   // tell that finish operation
   next();

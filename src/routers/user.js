@@ -2,14 +2,11 @@ const express = require("express");
 const router = new express.Router();
 const User = require("../models/user");
 const auth = require("../middleWare/auth");
-const chalk = require("chalk");
 const multer = require("multer");
 
 router.post("/users", async (req, res) => {
   try {
     const user = new User(req.body);
-
-    await user.generateBlockchainAccount();
     await user.generateAuthToken();
     await user.save();
     res.status(201).send(user);
@@ -143,7 +140,6 @@ const upload = multer({
   dest: "avatars",
 });
 router.post("/users/me/uploadavatar", upload.single("avatar"), (req, res) => {
-  console.log("something went");
   res.send("200");
 });
 
