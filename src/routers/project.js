@@ -82,6 +82,18 @@ router.get("/projects/popular", async (req, res) => {
   }
 });
 
+router.get("/projects/favourite", auth, async (req, res) => {
+  try {
+    const fav_projects = await Project.find({ "donors.donorId": req.user._id });
+
+    return !fav_projects
+      ? res.status(404).send()
+      : res.status(200).send(fav_projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 router.get("/projects/:id", auth, async (req, res) => {
   const _id = req.params.id;
   try {
@@ -94,7 +106,7 @@ router.get("/projects/:id", auth, async (req, res) => {
 });
 
 // Favourize by some user
-router.patch("/projects/:id/favourite", auth, async (req, res) => {
+router.patch("/projects/:userid/favourite", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
   const allowedUpdates = ["donors"];
@@ -107,7 +119,7 @@ router.patch("/projects/:id/favourite", auth, async (req, res) => {
 
   try {
     const project = await Project.findOne({
-      _id: req.params.id,
+      _id: req.params.userid,
     });
 
     if (!project) {
@@ -116,8 +128,6 @@ router.patch("/projects/:id/favourite", auth, async (req, res) => {
     project.donors = project.donors.concat({
       donorId: req.user._id,
     });
-    console.log("project - donors");
-    console.log(project.donors);
     project.save();
     res.send(project);
   } catch (error) {
