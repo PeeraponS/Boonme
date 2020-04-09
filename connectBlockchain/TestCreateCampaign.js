@@ -10,12 +10,9 @@ console.log(chalk.blue(`Endpoint: ${endPointUrl}`));
 const web3 = new Web3(endPointUrl);
 
 var myAddress = process.env.MANAGER_ADDRESS;
-const privateKeyOne = Buffer.from(
-  process.env.MANAGER_PRIVATEKEY,
-  "hex"
-);
+const privateKeyOne = Buffer.from(process.env.MANAGER_PRIVATEKEY, "hex");
 
-const contractABI = require("/12-3-2020/build/contracts/TimelockFactory.json");
+const contractABI = require("../build/contracts/TimelockFactory.json");
 var contractAddress = "0x48D127F36B48aFBd2E9A22001437644C393158F9";
 
 console.log(process.env.TOKEN_ADDRESS);
@@ -76,9 +73,13 @@ const createCampaign = async (
 const getDeployed = async () => {
   const contract = new web3.eth.Contract(contractABI.abi, contractAddress);
   try {
-    contract.methods.getDeployedCampaigns().call((err, result) => {
+    contract.methods.getDeployedCampaigns().call((err, results) => {
       if (err) console.log(chalk.red(err));
-      else console.log(chalk.yellow(result));
+      else {
+        for (const result of results) {
+          console.log(chalk.yellow(result));
+        }
+      }
     });
   } catch (err) {
     console.log(err.message);
@@ -99,20 +100,36 @@ const findCampaign = async (choosedorderCampaign) => {
   }
 };
 
-
-var _nameCampaign = "Test6";
+var _nameCampaign = "น้ำท่วมร่วมใจ3";
 var _beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
-var _releaseTime = "1586354154";
-var _maxamount = "10000";
+var _releaseTime = "1586956813";
+var _maxamount = "50000";
 
-createCampaign(
-  process.env.TOKEN_ADDRESS,
-  _nameCampaign,
-  _beneficiary,
-  _releaseTime,
-  _maxamount
-);
+// createCampaign(
+//   process.env.TOKEN_ADDRESS,
+//   _nameCampaign,
+//   _beneficiary,
+//   _releaseTime,
+//   _maxamount
+// );
 // getDeployed();
+
+registerCampaign = async () => {
+  let _nameCampaign = "น้ำท่วมร่วมใจ3";
+  let _beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
+  let _releaseTime = "1586956813";
+  let _maxamount = "50000";
+
+  // await createCampaign(
+  //   process.env.TOKEN_ADDRESS,
+  //   _nameCampaign,
+  //   _beneficiary,
+  //   _releaseTime,
+  //   _maxamount
+  // );
+  await getDeployed();
+};
+registerCampaign();
 // findCampaign(0);
 
 //adress campaign =
