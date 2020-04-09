@@ -106,7 +106,7 @@ router.get("/projects/:id", auth, async (req, res) => {
 });
 
 // Favourize by some user
-router.patch("/projects/:userid/favourite", auth, async (req, res) => {
+router.patch("/projects/:id/favourite", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
   const allowedUpdates = ["donors"];
@@ -119,7 +119,7 @@ router.patch("/projects/:userid/favourite", auth, async (req, res) => {
 
   try {
     const project = await Project.findOne({
-      _id: req.params.userid,
+      _id: req.params.id,
     });
 
     if (!project) {
@@ -128,6 +128,8 @@ router.patch("/projects/:userid/favourite", auth, async (req, res) => {
     project.donors = project.donors.concat({
       donorId: req.user._id,
     });
+    console.log("project - donors");
+    console.log(project.donors);
     project.save();
     res.send(project);
   } catch (error) {
