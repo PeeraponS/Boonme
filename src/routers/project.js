@@ -19,7 +19,6 @@ router.post("/projects", auth, async (req, res) => {
 });
 
 // GET /projects/?complete=true
-// GET /projects/?limit=number&skip=number
 // GET /projects/?project_type=project_type
 router.get("/projects", async (req, res) => {
   // 50%, no filter
@@ -32,6 +31,22 @@ router.get("/projects", async (req, res) => {
 
   try {
     const projects = await Project.find(query);
+    res.send(projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// Search campaign
+router.get("/projects/search", async (req, res) => {
+  const regex = new RegExp(`${req.query.search}*`, "g");
+
+  try {
+    const projects = await Project.find({
+      name: {
+        $regex: regex,
+      },
+    });
     res.send(projects);
   } catch (error) {
     res.status(500).send(error);
