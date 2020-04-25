@@ -8,6 +8,7 @@ router.post("/projects", auth, async (req, res) => {
   const project = new Project({
     ...req.body,
     creator: req.user._id,
+    due_date: new Date(req.body.due_date),
   });
 
   try {
