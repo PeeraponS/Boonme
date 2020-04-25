@@ -9,15 +9,6 @@ const {
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      trim: true,
-    },
-    username: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     email: {
       type: String,
       required: true,
@@ -28,6 +19,12 @@ const userSchema = new mongoose.Schema(
           throw new Error("Email is invalid.");
         }
       },
+    },
+
+    username: {
+      type: String,
+      required: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -43,6 +40,18 @@ const userSchema = new mongoose.Schema(
     userpin: {
       type: String,
       minlength: 4,
+      trim: true,
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    name: {
+      type: String,
       trim: true,
     },
     age: {
@@ -71,6 +80,9 @@ const userSchema = new mongoose.Schema(
         }
       },
     },
+    avatar: {
+      type: Buffer,
+    },
     bc_account: {
       type: Object,
     },
@@ -95,27 +107,17 @@ userSchema.methods.toJSON = function () {
 
   delete userObject.password;
   delete userObject.tokens;
+  delete userObject.avatar;
 
   return userObject;
 };
-
-// // instance method
-// userSchema.methods.generateBlockchainAccount = async function () {
-//   const user = this;
-
-//   bc_account = await create_encrypted_account(password);
-//   user.bc_account = bc_account;
-
-//   // return token;
-//   return bc_account;
-// };
 
 // instance method
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
 
   // get token
-  const token = jwt.sign({ _id: user._id.toString() }, "thisismynewcourse");
+  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
   user.tokens = user.tokens.concat({
     token,
   });

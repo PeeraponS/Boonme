@@ -75,6 +75,13 @@ const projectSchema = new mongoose.Schema(
         },
       },
     ],
+    followers: [
+      {
+        followerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

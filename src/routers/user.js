@@ -5,6 +5,8 @@ const multer = require("multer");
 const User = require("../models/user");
 const auth = require("../middleWare/auth");
 const { checkBalance } = require("../../connectBlockchain/Mytoken");
+const multer = require("multer");
+const sharp = require("sharp");
 
 router.post("/users", async (req, res) => {
   try {
@@ -83,9 +85,18 @@ router.get("/users/goodcoin", auth, async (req, res) => {
 });
 
 router.patch("/users/:id", async (req, res) => {
+router.patch("/users/me/update", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "age"];
+  const allowedUpdates = [
+    "name",
+    "email",
+    "password",
+    "age",
+    "username",
+    "user",
+    "userpin",
+  ];
   const isValidOperation = updates.every((update) => {
     return allowedUpdates.includes(update);
   });
@@ -94,42 +105,13 @@ router.patch("/users/:id", async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.params.id);
+    // const user = await User.findById(req.params.id);
+    const user = req.user;
     updates.forEach((key) => (user[key] = req.body[key]));
     user.save();
 
     if (!user) {
       return res.status(404).send();
-    }
-
-    res.send(user);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-router.patch("/users/:id/updatepin", auth, async (req, res) => {
-  // add some property that doesn't exits in the first place
-  const updates = Object.keys(req.body);
-  const allowedUpdates = ["userpin"];
-  const isValidOperation = updates.every((update) => {
-    return allowedUpdates.includes(update);
-  });
-  if (!isValidOperation) {
-    return res.status(400).send({ error: "Invalid updates" });
-  }
-
-  try {
-    const user = await User.findById(req.params.id);
-    updates.forEach((key) => {
-      user[key] = req.body[key];
-    });
-    await user.save();
-
-    if (!user) {
-      return res.status(404).send({
-        dataSent: req.params,
-      });
     }
 
     res.send(user);
@@ -148,10 +130,60 @@ router.delete("/users/me", auth, async (req, res) => {
 });
 
 const upload = multer({
-  dest: "avatars",
+  limits: {
+    fileSize: 1000000,
+  },
+  fileFilter(req, file, callback) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return callback(new Error("Please upload an image"));
+    }
+
+    // callback(new Error('plase upload an image'))
+    callback(undefined, true);
+  },
 });
-router.post("/users/me/uploadavatar", upload.single("avatar"), (req, res) => {
-  res.send("200");
+router.post(
+  "/users/me/uploadavatar",
+  auth,
+  upload.single("avatar"),
+  async (req, res) => {
+    const buffer = await sharp(req.file.buffer)
+      .png()
+      .resize({
+        width: 250,
+        height: 250,
+      })
+      .toBuffer();
+
+    // access file upload and assign to avatar
+    req.user.avatar = buffer;
+    await req.user.save();
+    res.send();
+  },
+  (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+  }
+);
+
+router.delete("/users/me/uploadavatar", auth, async (req, res) => {
+  req.user.avatar = undefined;
+  await req.user.save();
+  res.send();
+});
+
+// use
+router.get("/users/:id/avatar", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || !user.avatar) {
+      throw new Error();
+    }
+    res.set("Content-Type", "image/jpg");
+    res.send(user.avatar);
+  } catch (error) {
+    res.status(404).send();
+  }
 });
 
 module.exports = router;
