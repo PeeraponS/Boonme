@@ -63,15 +63,14 @@ const userSchema = new mongoose.Schema(
         }
       },
     },
-    goodcoin: {
-      type: Number,
-      default: 0,
-      validate(value) {
-        if (value < 0) {
-          throw new Error("goodcoin must be positive number");
-        }
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
       },
-    },
+    ],
     cash: {
       type: Number,
       default: 0,

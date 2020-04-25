@@ -13,6 +13,9 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(userRouter);
 app.use(projectRouter);
+app.get("/", (req, res) => {
+  res.send("Welcome");
+});
 
 app.listen(port, () => {
   console.log("Server is up on " + port);

@@ -3,11 +3,12 @@ const router = new express.Router();
 const Project = require("../models/project");
 const auth = require("../middleWare/auth");
 
+// Create new campaign
 router.post("/projects", auth, async (req, res) => {
-  // const project = new Project(req.body);
   const project = new Project({
     ...req.body,
     creator: req.user._id,
+    due_date: new Date(req.body.due_date),
   });
 
   try {

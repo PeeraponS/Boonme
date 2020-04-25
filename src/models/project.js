@@ -1,4 +1,10 @@
 const mongoose = require("mongoose");
+const {
+  registerCampaign,
+} = require("../../connectBlockchain/TestCreateCampaign");
+const {
+  create_encrypted_account,
+} = require("../../connectBlockchain/CreateAccounts");
 const projectSchema = new mongoose.Schema(
   {
     name: {
@@ -47,9 +53,14 @@ const projectSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    address_blockchain: {
+    bc_address: {
       type: String,
     },
+    // password_blockchain: {
+    //   type: String,
+    //   minlength: 6,
+    //   trim: true,
+    // },
     donation_recipients_blockchain: [
       {
         publicKey: {
@@ -76,6 +87,26 @@ const projectSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// middle ware before
+projectSchema.pre("save", async function (next) {
+  // edit some variable before saving to the mongoDb
+
+  const project = this;
+  const beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
+  const releaseTime = "1586956813";
+  const maxamount = "50000";
+  project.bc_address = await registerCampaign(
+    project.name,
+    beneficiary,
+    releaseTime,
+    maxamount
+  );
+
+  // tell that finish operation
+  next();
+});
+
 const Project = mongoose.model("Project", projectSchema);
 
 module.exports = Project;

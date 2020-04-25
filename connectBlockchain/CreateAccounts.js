@@ -40,9 +40,9 @@ const decrypt = async (keystoreJsonV3, password) => {
   return decrypt;
 };
 
-const create_encrypted_account = async () => {
+const create_encrypted_account = async (password) => {
   const account = await createAccount();
-  const encrypted_account = await encrypt(account.privateKey, "1234567890");
+  const encrypted_account = await encrypt(account.privateKey, password);
   return encrypted_account;
 };
 

@@ -1,7 +1,10 @@
 const express = require("express");
 const router = new express.Router();
+const multer = require("multer");
+
 const User = require("../models/user");
 const auth = require("../middleWare/auth");
+const { checkBalance } = require("../../connectBlockchain/Mytoken");
 const multer = require("multer");
 const sharp = require("sharp");
 
@@ -72,6 +75,16 @@ router.get("/users/me", auth, async (req, res) => {
   res.send(req.user);
 });
 
+router.get("/users/goodcoin", auth, async (req, res) => {
+  const bc_address = req.user.bc_account.address;
+  const balance = await checkBalance(bc_address);
+
+  res.send({
+    goodcoin_balance: parseInt(balance, 10),
+  });
+});
+
+router.patch("/users/:id", async (req, res) => {
 router.patch("/users/me/update", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
