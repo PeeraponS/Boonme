@@ -1,6 +1,5 @@
 const express = require("express");
 const router = new express.Router();
-const multer = require("multer");
 
 const User = require("../models/user");
 const auth = require("../middleWare/auth");
@@ -84,7 +83,6 @@ router.get("/users/goodcoin", auth, async (req, res) => {
   });
 });
 
-router.patch("/users/:id", async (req, res) => {
 router.patch("/users/me/update", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
