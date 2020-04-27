@@ -38,7 +38,7 @@ router.get("/projects", async (req, res) => {
   }
 });
 
-// sort by diff (date, fund)
+// sort by diff (date)
 router.get("/projects/expiresoon", async (req, res) => {
   try {
     const projects_db = await Project.find({});
@@ -59,6 +59,37 @@ router.get("/projects/expiresoon", async (req, res) => {
     expired_soon_projects.sort((a, b) => a.datediff - b.datediff);
 
     res.send(expired_soon_projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// sort by diff donation
+router.get("/projects/donation_almost_max", async (req, res) => {
+  try {
+    const projects_db = await Project.find({});
+    const donation_almost_max_projects = [];
+
+    // not expired campaign should has positive datediff
+    for (let i = 0; i < projects_db.length; i++) {
+      let project = projects_db[i].toObject();
+      project["maxdonate_realdonate_diff"] =
+        project["max_donation_amount"] - project["donation_amount"];
+
+      // filtered only not expired campaign and isn't completed
+      if (
+        project.is_completed == false &&
+        project.maxdonate_realdonate_diff > 0
+      )
+        donation_almost_max_projects.push(project);
+    }
+
+    // Sort
+    donation_almost_max_projects.sort(
+      (a, b) => a.maxdonate_realdonate_diff - b.maxdonate_realdonate_diff
+    );
+
+    res.send(donation_almost_max_projects);
   } catch (error) {
     res.status(500).send(error);
   }
