@@ -45,7 +45,11 @@ router.post("/users/login", async (req, res) => {
   }
 });
 
-router.post("/users/:id/depositcash", auth, async (req, res) => {
+router.get("/users/me", auth, async (req, res) => {
+  res.send(req.user);
+});
+
+router.post("/users/me/depositcash", auth, async (req, res) => {
   try {
     //get user from 'Auth function'
     const user = req.user;
@@ -56,31 +60,6 @@ router.post("/users/:id/depositcash", auth, async (req, res) => {
   } catch (error) {
     res.status(400).send({ datasent: req.body, error });
   }
-});
-
-router.post("/users/:id/buytoken", auth, async (req, res) => {
-  try {
-    //get user from 'Auth function'
-    const user = req.user;
-    user.goodcoin = user.goodcoin + req.body.goodcoinValue;
-    await user.save();
-    res.status(200).send({ user: user });
-  } catch (error) {
-    res.status(400).send({ datasent: req.body, error });
-  }
-});
-
-router.get("/users/me", auth, async (req, res) => {
-  res.send(req.user);
-});
-
-router.get("/users/goodcoin", auth, async (req, res) => {
-  const bc_address = req.user.bc_account.address;
-  const balance = await checkBalance(bc_address);
-
-  res.send({
-    goodcoin_balance: parseInt(balance, 10),
-  });
 });
 
 router.patch("/users/me/update", auth, async (req, res) => {
