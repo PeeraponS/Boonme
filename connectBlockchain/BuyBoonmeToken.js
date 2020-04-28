@@ -1,15 +1,9 @@
 const Web3 = require("web3");
-const chalk = require("chalk");
 require("dotenv").config();
-const endPointUrl =
-  "https://rinkeby.infura.io/v3/991d6c0c5fd54ee4bac60feed128dffd";
 const Tx = require("ethereumjs-tx").Transaction;
-
-const web3 = new Web3(endPointUrl);
-
+const web3 = new Web3(process.env.INFURA_NETWORK_URL);
 const contractABI = require("../build/contracts/Token.json");
-const contractAddress = "0xE4289B1DdDc2d8F678c4431C240A9940f0B69e70";
-
+const contractAddress = process.env.ERC20TOKEN_CONTRACT_ADDRESS;
 const myAddress = process.env.MANAGER_ADDRESS;
 const privateKeyOne = Buffer.from(process.env.MANAGER_PRIVATEKEY, "hex");
 
@@ -18,15 +12,14 @@ const buytoken = async (purchasrAddress, purchaseAmount) => {
     from: myAddress,
   });
 
+  // tx config
   const count = await web3.eth.getTransactionCount(myAddress);
   const gasPrice = await web3.eth.getGasPrice();
-
   const gasLimit = 1000000;
   const chainId = 4;
 
   const rawTransaction = {
     from: myAddress,
-    /* "nonce": "0x" + count.toString(16),*/
     nonce: web3.utils.toHex(count),
     gasPrice: web3.utils.toHex(gasPrice),
     gasLimit: web3.utils.toHex(gasLimit),
@@ -42,9 +35,7 @@ const buytoken = async (purchasrAddress, purchaseAmount) => {
   tx.sign(privateKeyOne);
   const serializedTx = tx.serialize();
 
-  const receipt = await web3.eth.sendSignedTransaction(
-    "0x" + serializedTx.toString("hex")
-  );
+  await web3.eth.sendSignedTransaction("0x" + serializedTx.toString("hex"));
 };
 
 // example
