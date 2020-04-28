@@ -102,6 +102,8 @@ projectSchema.pre("save", async function (next) {
     releaseTime,
     maxamount
   );
+  console.log("bc_address_after");
+  console.log(project.bc_address);
 
   // tell that finish operation
   next();

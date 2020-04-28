@@ -102,7 +102,7 @@ var _releaseTime = "1586956813";
 var _maxamount = "50000";
 
 // createCampaign(
-//   process.env.TOKEN_ADDRESS,
+//   process.env.ERC20TOKEN_CONTRACT_ADDRESS,
 //   _nameCampaign,
 //   _beneficiary,
 //   _releaseTime,
@@ -123,7 +123,7 @@ registerCampaign = async (
 
   try {
     await createCampaign(
-      process.env.TOKEN_ADDRESS,
+      process.env.ERC20TOKEN_CONTRACT_ADDRESS,
       nameCampaign,
       beneficiary,
       releaseTime,
