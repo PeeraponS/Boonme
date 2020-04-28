@@ -1,15 +1,55 @@
+require('dotenv').config()
 const Web3 = require("web3");
 const web3 = new Web3(Web3.givenProvider || process.env.INFURA_NETWORK_URL);
 const chalk = require("chalk");
+var Tx = require('ethereumjs-tx').Transaction;
+web3.eth.defaultAccount = process.env.WALLET_ADDRESS
+
 
 const infura = "https://rinkeby.infura.io/v3/991d6c0c5fd54ee4bac60feed128dffd";
 const url = "https://localhost:8546";
 
 const createAccount = async () => {
   var account = await web3.eth.accounts.create(["this is my seed phrase"]);
-  // console.log(chalk.greenBright(JSON.stringify(create, null)));
+  console.log(chalk.greenBright(JSON.stringify(account, null)));
+  
+  var myAddress = process.env.MANAGER_ADDRESS;
+  var privateKeyOne = Buffer.from(process.env.MANAGER_PRIVATEKEY, "hex");
+  var recipient = account.address;
+  var balance = await web3.eth.getBalance(myAddress);
+
+	console.log("Balance ETH: " + balance);
+
+  var count = await web3.eth.getTransactionCount(myAddress);
+  const gasPrice = await web3.eth.getGasPrice();
+  
+  console.log("gasPrice: "+ gasPrice)
+  var gasLimit = 1000000;
+  var chainId = 4;
+  
+  var rawTransaction = {
+    "from": myAddress,
+    /* "nonce": "0x" + count.toString(16),*/
+    "nonce":  web3.utils.toHex(count),
+    "gasPrice": web3.utils.toHex(gasPrice),
+    "gasLimit": web3.utils.toHex(gasLimit),
+    "to": recipient,
+    "value": web3.utils.toHex( web3.utils.toWei('1', 'Finney') ),
+    "chainId": chainId
+  };
+  
+  var tx = new Tx(rawTransaction, {'chain':'rinkeby'});
+  tx.sign(privateKeyOne);
+  var serializedTx = tx.serialize();
+  
+  var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
+  console.log("Receipt info: " + JSON.stringify(receipt, null));
+  
+  var balanceTwo = await web3.eth.getBalance(recipient);
+	console.log("Balance of addressTwo: " + balanceTwo);
   return account;
 };
+
 
 const createAccounts = async (quantity) => {
   var arr = [];
@@ -47,6 +87,7 @@ const create_encrypted_account = async (password) => {
 };
 
 // createAccount();
+// transferEther("0xbca841cec9ed2F2fdcEEeF5426901d422C719104");
 // createAccounts(10);
 // privateKeyToAccount('0x7dacb9783651a8c10f9665e731ec5f925d3f7f19122bb43e4bb6e111399600d0');
 // encrypt('0x7dacb9783651a8c10f9665e731ec5f925d3f7f19122bb43e4bb6e111399600d0', 'TestPassword999');
