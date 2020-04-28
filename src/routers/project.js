@@ -3,11 +3,12 @@ const router = new express.Router();
 const Project = require("../models/project");
 const auth = require("../middleWare/auth");
 
+// Create new campaign
 router.post("/projects", auth, async (req, res) => {
-  // const project = new Project(req.body);
   const project = new Project({
     ...req.body,
     creator: req.user._id,
+    due_date: new Date(req.body.due_date),
   });
 
   try {
@@ -19,7 +20,6 @@ router.post("/projects", auth, async (req, res) => {
 });
 
 // GET /projects/?complete=true
-// GET /projects/?limit=number&skip=number
 // GET /projects/?project_type=project_type
 router.get("/projects", async (req, res) => {
   // 50%, no filter
@@ -32,6 +32,79 @@ router.get("/projects", async (req, res) => {
 
   try {
     const projects = await Project.find(query);
+    res.send(projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// sort by diff (date)
+router.get("/projects/expiresoon", async (req, res) => {
+  try {
+    const projects_db = await Project.find({});
+    const expired_soon_projects = [];
+
+    // not expired campaign should has positive datediff
+    for (let i = 0; i < projects_db.length; i++) {
+      let project = projects_db[i].toObject();
+      project["datediff"] =
+        projects_db[i].due_date.getTime() - new Date().getTime();
+
+      // filtered only not expired campaign and isn't completed
+      if (project.is_completed == false && project.datediff > 0)
+        expired_soon_projects.push(project);
+    }
+
+    // Sort
+    expired_soon_projects.sort((a, b) => a.datediff - b.datediff);
+
+    res.send(expired_soon_projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// sort by diff donation
+router.get("/projects/donation_almost_max", async (req, res) => {
+  try {
+    const projects_db = await Project.find({});
+    const donation_almost_max_projects = [];
+
+    // not expired campaign should has positive datediff
+    for (let i = 0; i < projects_db.length; i++) {
+      let project = projects_db[i].toObject();
+      project["maxdonate_realdonate_diff"] =
+        project["max_donation_amount"] - project["donation_amount"];
+
+      // filtered only not expired campaign and isn't completed
+      if (
+        project.is_completed == false &&
+        project.maxdonate_realdonate_diff > 0
+      )
+        donation_almost_max_projects.push(project);
+    }
+
+    // Sort
+    donation_almost_max_projects.sort(
+      (a, b) => a.maxdonate_realdonate_diff - b.maxdonate_realdonate_diff
+    );
+
+    res.send(donation_almost_max_projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// Search campaign
+router.get("/projects/search", async (req, res) => {
+  const regex = new RegExp(`${req.query.search}*`, "g");
+
+  try {
+    const projects = await Project.find({
+      name: {
+        $regex: regex,
+      },
+    });
     res.send(projects);
   } catch (error) {
     res.status(500).send(error);
@@ -82,6 +155,20 @@ router.get("/projects/popular", async (req, res) => {
   }
 });
 
+router.get("/projects/favourite", auth, async (req, res) => {
+  try {
+    const fav_projects = await Project.find({
+      "followers.followerId": req.user._id,
+    });
+
+    return !fav_projects
+      ? res.status(404).send()
+      : res.status(200).send(fav_projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 router.get("/projects/:id", auth, async (req, res) => {
   const _id = req.params.id;
   try {
@@ -93,6 +180,37 @@ router.get("/projects/:id", auth, async (req, res) => {
   }
 });
 
+// Favourize by some user
+router.patch("/projects/:userid/favourite", auth, async (req, res) => {
+  // add some property that doesn't exits in the first place
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["donors"];
+  const isValidOperation = updates.every((update) => {
+    return allowedUpdates.includes(update);
+  });
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid updates" });
+  }
+
+  try {
+    const project = await Project.findOne({
+      _id: req.params.userid,
+    });
+
+    if (!project) {
+      return res.status(404).send();
+    }
+    project.followers = project.followers.concat({
+      followerId: req.user._id,
+    });
+    project.save();
+    res.send(project);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// Edit campaign detail by campaign-owner
 router.patch("/projects/:id", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
@@ -121,6 +239,7 @@ router.patch("/projects/:id", auth, async (req, res) => {
   }
 });
 
+// Delete campaign  by campaign-owner
 router.delete("/projects/:id", auth, async (req, res) => {
   try {
     const project = await Project.findByIdAndDelete({

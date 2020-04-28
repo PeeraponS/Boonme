@@ -1,10 +1,11 @@
 const express = require("express");
 const router = new express.Router();
-const multer = require("multer");
 
 const User = require("../models/user");
 const auth = require("../middleWare/auth");
 const { checkBalance } = require("../../connectBlockchain/Mytoken");
+const multer = require("multer");
+// const sharp = require("sharp");
 
 router.post("/users", async (req, res) => {
   try {
@@ -44,7 +45,11 @@ router.post("/users/login", async (req, res) => {
   }
 });
 
-router.post("/users/:id/depositcash", auth, async (req, res) => {
+router.get("/users/me", auth, async (req, res) => {
+  res.send(req.user);
+});
+
+router.post("/users/me/depositcash", auth, async (req, res) => {
   try {
     //get user from 'Auth function'
     const user = req.user;
@@ -57,35 +62,18 @@ router.post("/users/:id/depositcash", auth, async (req, res) => {
   }
 });
 
-router.post("/users/:id/buytoken", auth, async (req, res) => {
-  try {
-    //get user from 'Auth function'
-    const user = req.user;
-    user.goodcoin = user.goodcoin + req.body.goodcoinValue;
-    await user.save();
-    res.status(200).send({ user: user });
-  } catch (error) {
-    res.status(400).send({ datasent: req.body, error });
-  }
-});
-
-router.get("/users/me", auth, async (req, res) => {
-  res.send(req.user);
-});
-
-router.get("/users/goodcoin", auth, async (req, res) => {
-  const bc_address = req.user.bc_account.address;
-  const balance = await checkBalance(bc_address);
-
-  res.send({
-    goodcoin_balance: parseInt(balance, 10),
-  });
-});
-
-router.patch("/users/:id", async (req, res) => {
+router.patch("/users/me/update", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "age"];
+  const allowedUpdates = [
+    "name",
+    "email",
+    "password",
+    "age",
+    "username",
+    "user",
+    "userpin",
+  ];
   const isValidOperation = updates.every((update) => {
     return allowedUpdates.includes(update);
   });
@@ -94,42 +82,13 @@ router.patch("/users/:id", async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.params.id);
+    // const user = await User.findById(req.params.id);
+    const user = req.user;
     updates.forEach((key) => (user[key] = req.body[key]));
     user.save();
 
     if (!user) {
       return res.status(404).send();
-    }
-
-    res.send(user);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-router.patch("/users/:id/updatepin", auth, async (req, res) => {
-  // add some property that doesn't exits in the first place
-  const updates = Object.keys(req.body);
-  const allowedUpdates = ["userpin"];
-  const isValidOperation = updates.every((update) => {
-    return allowedUpdates.includes(update);
-  });
-  if (!isValidOperation) {
-    return res.status(400).send({ error: "Invalid updates" });
-  }
-
-  try {
-    const user = await User.findById(req.params.id);
-    updates.forEach((key) => {
-      user[key] = req.body[key];
-    });
-    await user.save();
-
-    if (!user) {
-      return res.status(404).send({
-        dataSent: req.params,
-      });
     }
 
     res.send(user);
@@ -148,10 +107,60 @@ router.delete("/users/me", auth, async (req, res) => {
 });
 
 const upload = multer({
-  dest: "avatars",
+  limits: {
+    fileSize: 1000000,
+  },
+  fileFilter(req, file, callback) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return callback(new Error("Please upload an image"));
+    }
+
+    // callback(new Error('plase upload an image'))
+    callback(undefined, true);
+  },
 });
-router.post("/users/me/uploadavatar", upload.single("avatar"), (req, res) => {
-  res.send("200");
+// router.post(
+//   "/users/me/uploadavatar",
+//   auth,
+//   upload.single("avatar"),
+//   async (req, res) => {
+//     const buffer = await sharp(req.file.buffer)
+//       .png()
+//       .resize({
+//         width: 250,
+//         height: 250,
+//       })
+//       .toBuffer();
+
+//     // access file upload and assign to avatar
+//     req.user.avatar = buffer;
+//     await req.user.save();
+//     res.send();
+//   },
+//   (error, req, res, next) => {
+//     res.status(400).send({ error: error.message });
+//   }
+// );
+
+router.delete("/users/me/uploadavatar", auth, async (req, res) => {
+  req.user.avatar = undefined;
+  await req.user.save();
+  res.send();
+});
+
+// use
+router.get("/users/:id/avatar", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || !user.avatar) {
+      throw new Error();
+    }
+    res.set("Content-Type", "image/jpg");
+    res.send(user.avatar);
+  } catch (error) {
+    res.status(404).send();
+  }
 });
 
 module.exports = router;

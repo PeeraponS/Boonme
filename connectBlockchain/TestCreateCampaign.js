@@ -15,8 +15,6 @@ const privateKeyOne = Buffer.from(process.env.MANAGER_PRIVATEKEY, "hex");
 const contractABI = require("../build/contracts/TimelockFactory.json");
 var contractAddress = "0x48D127F36B48aFBd2E9A22001437644C393158F9";
 
-console.log(process.env.TOKEN_ADDRESS);
-
 const createCampaign = async (
   _token,
   _nameCampaign,
@@ -73,12 +71,10 @@ const createCampaign = async (
 const getDeployed = async () => {
   const contract = new web3.eth.Contract(contractABI.abi, contractAddress);
   try {
-    contract.methods.getDeployedCampaigns().call((err, results) => {
+    return contract.methods.getDeployedCampaigns().call((err, results) => {
       if (err) console.log(chalk.red(err));
       else {
-        for (const result of results) {
-          console.log(chalk.yellow(result));
-        }
+        return results;
       }
     });
   } catch (err) {
@@ -93,7 +89,7 @@ const findCampaign = async (choosedorderCampaign) => {
       .deployedCampaigns(choosedorderCampaign)
       .call((err, result) => {
         if (err) console.log(chalk.red(err));
-        else console.log(chalk.yellow(result));
+        else console.log(chalk.blueBright(result));
       });
   } catch (err) {
     console.log(err.message);
@@ -106,7 +102,7 @@ var _releaseTime = "1586956813";
 var _maxamount = "50000";
 
 // createCampaign(
-//   process.env.TOKEN_ADDRESS,
+//   process.env.ERC20TOKEN_CONTRACT_ADDRESS,
 //   _nameCampaign,
 //   _beneficiary,
 //   _releaseTime,
@@ -114,23 +110,37 @@ var _maxamount = "50000";
 // );
 // getDeployed();
 
-registerCampaign = async () => {
-  let _nameCampaign = "น้ำท่วมร่วมใจ3";
-  let _beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
-  let _releaseTime = "1586956813";
-  let _maxamount = "50000";
+registerCampaign = async (
+  nameCampaign,
+  beneficiary,
+  releaseTime,
+  maxamount
+) => {
+  // let _nameCampaign = "ไฟไหม้ร่วมใจ";
+  // let _beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
+  // let _releaseTime = "1586956813";
+  // let _maxamount = "50000";
 
-  // await createCampaign(
-  //   process.env.TOKEN_ADDRESS,
-  //   _nameCampaign,
-  //   _beneficiary,
-  //   _releaseTime,
-  //   _maxamount
-  // );
-  await getDeployed();
+  try {
+    await createCampaign(
+      process.env.ERC20TOKEN_CONTRACT_ADDRESS,
+      nameCampaign,
+      beneficiary,
+      releaseTime,
+      maxamount
+    );
+    const deployedCampaign = await getDeployed();
+    return deployedCampaign[deployedCampaign.length - 1];
+  } catch (error) {
+    console.log(chalk.red(error.message));
+  }
 };
-registerCampaign();
+// registerCampaign();
 // findCampaign(0);
 
 //adress campaign =
 //          [0]   = 0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7
+
+module.exports = {
+  registerCampaign,
+};
