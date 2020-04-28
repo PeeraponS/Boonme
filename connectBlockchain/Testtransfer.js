@@ -54,6 +54,9 @@ const transferto = async (myAddress, privateKeyOne, addressTwo, transferAmount) 
   var balanceTwo = await contract.methods.balanceOf(addressTwo).call();
   console.log("Balance after send: " + balance);
   console.log("Balance of addressTwo " + balanceTwo)
+  console.log("TxHash :" + receipt.transactionHash)
+  var TxHash = receipt.transactionHash;
+  return TxHash;
   
 }
 
@@ -64,4 +67,4 @@ const privateKeyTwo = Buffer.from("83a0081abc7ef41202bb691ccb6de8e34677a763fad5c
 var transferAmount = 5000;
 var addressCampaign = "0x69A17c8fAbA2cF41Afc5F5874A487b844D5Cf9E7"
 
-transferto(myAddress, privateKeyOne, addressCampaign ,transferAmount)
+transferto(myAddress, privateKeyOne, toAddress ,transferAmount)
