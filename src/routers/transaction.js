@@ -7,7 +7,27 @@ const { decrypt } = require("../../connectBlockchain/CreateAccounts");
 const { transferto } = require("../../connectBlockchain/Testtransfer");
 const Transaction = require("../models/transaction");
 
-// Check goodcoin balance
+// get all tx
+router.get("/transaction", async (req, res) => {
+  try {
+    const transactions = await Transaction.find({});
+    res.send(transactions);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// get all tx related to this user
+router.get("/transaction/own", auth, async (req, res) => {
+  try {
+    const transactions = await Transaction.find({ donor_id: req.user });
+    res.send(transactions);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// donate
 router.post("/transaction/donate/:projectid", auth, async (req, res) => {
   try {
     // refuse any action if not found the project
