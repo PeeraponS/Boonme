@@ -224,6 +224,7 @@ router.get("/projects/balance/:projectid", async (req, res) => {
 
     res.send({
       campaign_donation_amount,
+      campaign_address: project.bc_address,
     });
   } catch (error) {
     res.status(400).send(error);
