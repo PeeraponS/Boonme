@@ -34,14 +34,21 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
     const project = await Project.findById(req.params.projectid);
     const isExpired =
       project.due_date.getTime() - new Date().getTime() < 0 ? true : false;
-    if (!project | isExpired) return res.status(400).send();
+    if (!project | isExpired)
+      return res.status(400).send({
+        error: "expired or not found project",
+        project,
+        isExpired,
+      });
 
     // check user goodcoin balance
     const balance = await goodCoin.checkBalance(req.user.bc_account.address);
-    if (balance < req.body.donateValue)
+    if (balance < req.body.donate)
       return res.status(400).send({
         error:
           "You have not enough of goodcoin, please buy it before you donate any campaign.",
+        balance,
+        donate: req.body.donate,
       });
 
     // check if the value user want to donate exceed the remaining amonut of donation or not
@@ -52,6 +59,7 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
       project.max_donation_amount - campaignDonationAmount;
     if (remaining_donation < req.body.donate)
       return res.status(400).send({
+        error: "donation amout is too high",
         remaining_donation,
         your_donate: req.body.donate,
       });
