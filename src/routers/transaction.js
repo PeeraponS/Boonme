@@ -5,6 +5,7 @@ const auth = require("../middleWare/auth");
 const goodCoin = require("../../connectBlockchain/Mytoken");
 const { decrypt } = require("../../connectBlockchain/CreateAccounts");
 const { transferto } = require("../../connectBlockchain/Testtransfer");
+const Transaction = require("../models/transaction");
 
 // Check goodcoin balance
 router.post("/transaction/donate/:projectid", auth, async (req, res) => {
@@ -42,12 +43,29 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
     const privateKeyOne = decoded_bc.privateKey.replace(/^0x/, "");
     const campaignAddress = project.bc_address;
     const transferAmount = req.body.donate;
-    await transferto(
+    const txHash = await transferto(
       fromAddress,
       privateKeyOne,
       campaignAddress,
       transferAmount
     );
+
+    // store txHash back to database
+    const transaction = new Transaction({
+      tx_hash: txHash,
+      donor_id: user._id,
+      donor_address: fromAddress,
+      project_address: campaignAddress,
+      donation_amount: transferAmount,
+    });
+    await transaction.save();
+
+    // update donors in campaign table
+    project.donors = project.donors.concat({
+      donorId: user._id,
+    });
+    await project.save();
+
     res.send();
   } catch (error) {
     res.status(400).send(error);
