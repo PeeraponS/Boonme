@@ -50,6 +50,8 @@ router.post("/erc20token/buytoken", auth, async (req, res) => {
 
     // buy token
     await buytoken(user.bc_account.address, goodcoinValue);
+    user.cash = user.cash - goodcoinValue;
+    user.save();
 
     res.status(200).send();
   } catch (error) {
