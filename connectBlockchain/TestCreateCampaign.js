@@ -22,6 +22,12 @@ const createCampaign = async (
   _releaseTime,
   _maxamount
 ) => {
+  console.log("In createCampaign");
+  console.log(_token);
+  console.log(_nameCampaign);
+  console.log(_beneficiary);
+  console.log(_releaseTime);
+  console.log(_maxamount);
   var balance = await web3.eth.getBalance(myAddress);
 
   console.log("Balance ETH: " + balance);
@@ -96,13 +102,13 @@ const findCampaign = async (choosedorderCampaign) => {
   }
 };
 
-var _nameCampaign = "น้ำท่วมร่วมใจ3";
-var _beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
-var _releaseTime = "1586956813";
-var _maxamount = "50000";
+// var _nameCampaign = "น้ำท่วมร่วมใจ3";
+// var _beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
+// var _releaseTime = "1586956813";
+// var _maxamount = "50000";
 
 // createCampaign(
-//   process.env.TOKEN_ADDRESS,
+//   process.env.ERC20TOKEN_CONTRACT_ADDRESS,
 //   _nameCampaign,
 //   _beneficiary,
 //   _releaseTime,
@@ -120,10 +126,15 @@ registerCampaign = async (
   // let _beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
   // let _releaseTime = "1586956813";
   // let _maxamount = "50000";
+  console.log("In Register Campaign");
+  console.log(nameCampaign);
+  console.log(beneficiary);
+  console.log(releaseTime);
+  console.log(maxamount);
 
   try {
     await createCampaign(
-      process.env.TOKEN_ADDRESS,
+      process.env.ERC20TOKEN_CONTRACT_ADDRESS,
       nameCampaign,
       beneficiary,
       releaseTime,

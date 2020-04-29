@@ -56,11 +56,6 @@ const projectSchema = new mongoose.Schema(
     bc_address: {
       type: String,
     },
-    // password_blockchain: {
-    //   type: String,
-    //   minlength: 6,
-    //   trim: true,
-    // },
     donation_recipients_blockchain: [
       {
         publicKey: {
@@ -94,10 +89,13 @@ projectSchema.pre("save", async function (next) {
 
   const project = this;
   const beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
-  const releaseTime = "1586956813";
-  const maxamount = "50000";
+  const releaseTime = Math.floor(project.due_date.getTime() / 1000).toString();
+  const maxamount = project.max_donation_amount;
   project.bc_address = await registerCampaign(
-    project.name,
+    (
+      Math.floor(Math.random() * (10000000000000000 - 999999999999999)) +
+      999999999999999
+    ).toString(),
     beneficiary,
     releaseTime,
     maxamount

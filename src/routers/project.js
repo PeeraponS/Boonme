@@ -3,6 +3,8 @@ const router = new express.Router();
 const Project = require("../models/project");
 const auth = require("../middleWare/auth");
 
+const { checkBalance } = require("../../connectBlockchain/Mytoken");
+
 // Create new campaign
 router.post("/projects", auth, async (req, res) => {
   const project = new Project({
@@ -205,6 +207,24 @@ router.patch("/projects/:userid/favourite", auth, async (req, res) => {
     });
     project.save();
     res.send(project);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// check project balance
+router.get("/projects/balance/:projectid", async (req, res) => {
+  try {
+    // refuse any action if not found the project
+    const project = await Project.findById(req.params.projectid);
+    if (!project) return res.status(400).send();
+
+    // check if the value user want to donate exceed the remaining amonut of donation or not
+    const campaign_donation_amount = await checkBalance(project.bc_address);
+
+    res.send({
+      campaign_donation_amount,
+    });
   } catch (error) {
     res.status(400).send(error);
   }
