@@ -64,6 +64,8 @@ router.post("/users/me/depositcash", auth, async (req, res) => {
 
 router.patch("/users/me/update", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
+  console.log("req.body");
+  console.log(req.body);
   const updates = Object.keys(req.body);
   const allowedUpdates = [
     "name",
@@ -85,7 +87,7 @@ router.patch("/users/me/update", auth, async (req, res) => {
     // const user = await User.findById(req.params.id);
     const user = req.user;
     updates.forEach((key) => (user[key] = req.body[key]));
-    user.save();
+    await user.save();
 
     if (!user) {
       return res.status(404).send();
