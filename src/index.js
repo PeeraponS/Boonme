@@ -6,6 +6,7 @@ const express = require("express");
 const userRouter = require("./routers/user");
 const projectRouter = require("./routers/project");
 const erc20Router = require("./routers/erc20token");
+const transactionRouter = require("./routers/transaction");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(userRouter);
 app.use(projectRouter);
 app.use(erc20Router);
+app.use(transactionRouter);
 app.get("/", (req, res) => {
   res.send("Welcome");
 });

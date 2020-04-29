@@ -56,11 +56,6 @@ const projectSchema = new mongoose.Schema(
     bc_address: {
       type: String,
     },
-    // password_blockchain: {
-    //   type: String,
-    //   minlength: 6,
-    //   trim: true,
-    // },
     donation_recipients_blockchain: [
       {
         publicKey: {
@@ -93,9 +88,6 @@ projectSchema.pre("save", async function (next) {
   // edit some variable before saving to the mongoDb
 
   const project = this;
-  // const beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
-  // const releaseTime = "1588251506";
-  // const maxamount = "50000";
   const beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
   const releaseTime = Math.floor(project.due_date.getTime() / 1000).toString();
   const maxamount = project.max_donation_amount;
