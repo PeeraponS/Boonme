@@ -106,24 +106,24 @@ router.delete("/users/me", auth, async (req, res) => {
   }
 });
 
-const upload = multer({
-  limits: {
-    fileSize: 1000000,
-  },
-  fileFilter(req, file, callback) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      return callback(new Error("Please upload an image"));
-    }
+// const upload = multer({
+//   limits: {
+//     fileSize: 1000000,
+//   },
+//   fileFilter(req, file, callback) {
+//     if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+//       return callback(new Error("Please upload an image"));
+//     }
 
-    // callback(new Error('plase upload an image'))
-    callback(undefined, true);
-  },
-});
+//     // callback(new Error('plase upload an image'))
+//     callback(undefined, true);
+//   },
+// });
 
 router.post(
   "/users/me/uploadavatar",
   auth,
-  upload.single("avatar"),
+  // upload.single("avatar"),
   async (req, res) => {
     // const buffer = await sharp(req.file.buffer)
     //   .png()
@@ -132,11 +132,13 @@ router.post(
     //     height: 250,
     //   })
     //   .toBuffer();
+    console.log("req.body.avatar");
+    console.log(req.body.avatar);
 
     // access file upload and assign to avatar
-    req.user.avatar = buffer;
-    await req.user.save();
-    res.send();
+    // req.user.avatar = buffer;
+    // await req.user.save();
+    res.send(req.body.avatar);
   },
   (error, req, res, next) => {
     res.status(400).send({ error: error.message });
