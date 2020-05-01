@@ -119,28 +119,29 @@ const upload = multer({
     callback(undefined, true);
   },
 });
-// router.post(
-//   "/users/me/uploadavatar",
-//   auth,
-//   upload.single("avatar"),
-//   async (req, res) => {
-//     const buffer = await sharp(req.file.buffer)
-//       .png()
-//       .resize({
-//         width: 250,
-//         height: 250,
-//       })
-//       .toBuffer();
 
-//     // access file upload and assign to avatar
-//     req.user.avatar = buffer;
-//     await req.user.save();
-//     res.send();
-//   },
-//   (error, req, res, next) => {
-//     res.status(400).send({ error: error.message });
-//   }
-// );
+router.post(
+  "/users/me/uploadavatar",
+  auth,
+  upload.single("avatar"),
+  async (req, res) => {
+    // const buffer = await sharp(req.file.buffer)
+    //   .png()
+    //   .resize({
+    //     width: 250,
+    //     height: 250,
+    //   })
+    //   .toBuffer();
+
+    // access file upload and assign to avatar
+    req.user.avatar = buffer;
+    await req.user.save();
+    res.send();
+  },
+  (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+  }
+);
 
 router.delete("/users/me/uploadavatar", auth, async (req, res) => {
   req.user.avatar = undefined;
