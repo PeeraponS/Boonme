@@ -133,12 +133,12 @@ router.post(
     //   })
     //   .toBuffer();
     console.log("req.body.avatar");
-    console.log(req.body.avatar);
+    console.log(req.body);
 
     // access file upload and assign to avatar
     // req.user.avatar = buffer;
     // await req.user.save();
-    res.send(req.body.avatar);
+    res.send(req.body);
   },
   (error, req, res, next) => {
     res.status(400).send({ error: error.message });
