@@ -5,6 +5,14 @@ const User = require("../models/user");
 const auth = require("../middleWare/auth");
 const { checkBalance } = require("../../connectBlockchain/Mytoken");
 const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + file.originalname);
+  },
+});
 const upload = multer({
   limits: {
     fileSize: 1000000,
@@ -13,12 +21,11 @@ const upload = multer({
     if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
       return callback(new Error("Please upload an image"));
     }
-
     // callback(new Error('plase upload an image'))
     callback(undefined, true);
   },
+  storage,
 });
-// const sharp = require("sharp");
 
 router.post("/users", async (req, res) => {
   try {
@@ -124,20 +131,11 @@ router.post(
   auth,
   upload.single("avatar"),
   async (req, res) => {
-    // const buffer = await sharp(req.file.buffer)
-    //   .png()
-    //   .resize({
-    //     width: 250,
-    //     height: 250,
-    //   })
-    //   .toBuffer();
-    console.log("req.file");
-    console.log(req.file);
-
     // access file upload and assign to avatar
     req.user.avatar = req.file;
-    await req.user.save();
-    res.send(req.file);
+    console.log(req.file);
+    // await req.user.save();
+    res.send("uploaded");
   },
   (error, req, res, next) => {
     res.status(400).send({ error: error.message });

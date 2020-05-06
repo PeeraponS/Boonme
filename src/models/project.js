@@ -77,6 +77,13 @@ const projectSchema = new mongoose.Schema(
         },
       },
     ],
+    comments: [
+      {
+        commentId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
