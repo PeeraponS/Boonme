@@ -103,15 +103,18 @@ projectSchema.pre("save", async function (next) {
   const beneficiary = "0x8233E9e38f5b13A97675f87D01262395901C58B8";
   const releaseTime = Math.floor(project.due_date.getTime() / 1000).toString();
   const maxamount = project.max_donation_amount;
-  project.bc_address = await registerCampaign(
-    (
-      Math.floor(Math.random() * (10000000000000000 - 999999999999999)) +
-      999999999999999
-    ).toString(),
-    beneficiary,
-    releaseTime,
-    maxamount
-  );
+
+  if (!project.bc_address) {
+    project.bc_address = await registerCampaign(
+      (
+        Math.floor(Math.random() * (10000000000000000 - 999999999999999)) +
+        999999999999999
+      ).toString(),
+      beneficiary,
+      releaseTime,
+      maxamount
+    );
+  }
 
   // tell that finish operation
   next();

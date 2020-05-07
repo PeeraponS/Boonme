@@ -55,6 +55,7 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
     const campaignDonationAmount = await goodCoin.checkBalance(
       project.bc_address
     );
+
     const remaining_donation =
       project.max_donation_amount - campaignDonationAmount;
     if (remaining_donation < req.body.donate)
@@ -66,11 +67,16 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
 
     // transfer to campaign
     const user = req.user;
+
     const decoded_bc = await decrypt(user.bc_account, user.password);
+    console.log(decoded_bc);
+
     const fromAddress = decoded_bc.address;
     const privateKeyOne = decoded_bc.privateKey.replace(/^0x/, "");
     const campaignAddress = project.bc_address;
     const transferAmount = req.body.donate;
+
+    // this is a problem
     const txHash = await transferto(
       fromAddress,
       privateKeyOne,
@@ -86,6 +92,8 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
       project_address: campaignAddress,
       donation_amount: transferAmount,
     });
+
+    // if blockchain error,
     await transaction.save();
 
     // update donors in campaign table
@@ -96,7 +104,7 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
 
     res.send();
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.message);
   }
 });
 
