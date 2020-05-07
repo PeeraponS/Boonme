@@ -1,6 +1,8 @@
 const express = require("express");
 const router = new express.Router();
 const Project = require("../models/project");
+const Post = require("../models/post");
+const Comment = require("../models/comment");
 const auth = require("../middleWare/auth");
 
 const { checkBalance } = require("../../connectBlockchain/Mytoken");
@@ -183,7 +185,37 @@ router.get("/projects/:id", auth, async (req, res) => {
 });
 
 // Favourize by some user
-router.patch("/projects/:userid/favourite", auth, async (req, res) => {
+router.patch("/projects/:projectId/favourite", auth, async (req, res) => {
+  // add some property that doesn't exits in the first place
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["comment"];
+  const isValidOperation = updates.every((update) => {
+    return allowedUpdates.includes(update);
+  });
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid updates" });
+  }
+
+  try {
+    const project = await Project.findOne({
+      _id: req.params.projectId,
+    });
+
+    if (!project) {
+      return res.status(404).send();
+    }
+    project.followers = project.followers.concat({
+      followerId: req.user._id,
+    });
+    project.save();
+    res.send(project);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// Comment by some user
+router.patch("/projects/:projectId/comment", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
   const updates = Object.keys(req.body);
   const allowedUpdates = ["donors"];
@@ -196,7 +228,7 @@ router.patch("/projects/:userid/favourite", auth, async (req, res) => {
 
   try {
     const project = await Project.findOne({
-      _id: req.params.userid,
+      _id: req.params.projectId,
     });
 
     if (!project) {

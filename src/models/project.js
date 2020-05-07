@@ -77,18 +77,23 @@ const projectSchema = new mongoose.Schema(
         },
       },
     ],
-    comments: [
-      {
-        commentId: {
-          type: mongoose.Schema.Types.ObjectId,
-        },
-      },
-    ],
   },
   {
     timestamps: true,
   }
 );
+
+// projectSchema.virtual("post", {
+//   ref: "Post",
+//   localField: "_id", //_id of user
+//   foreignField: "projectId",
+// });
+
+projectSchema.virtual("comments", {
+  ref: "Comment",
+  localField: "_id", //_id of project
+  foreignField: "project_id",
+});
 
 // middle ware before
 projectSchema.pre("save", async function (next) {

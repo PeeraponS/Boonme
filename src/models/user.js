@@ -100,6 +100,18 @@ userSchema.virtual("projects", {
   foreignField: "creator",
 });
 
+// userSchema.virtual("posts", {
+//   ref: "Project",
+//   localField: "_id", //_id of user
+//   foreignField: "creator",
+// });
+
+userSchema.virtual("comments", {
+  ref: "Comment",
+  localField: "_id", //_id of user
+  foreignField: "commentator_id",
+});
+
 // this method will called automatically when the object is passed to JSON.stringify
 userSchema.methods.toJSON = function () {
   const user = this;
