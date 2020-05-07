@@ -12,15 +12,13 @@ const postSchema = new mongoose.Schema(
         },
       },
     ],
-    poster_id: {
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-      },
+    writer_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
     project_id: {
-      projectId: {
-        type: mongoose.Schema.Types.ObjectId,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
     },
   },
   {

@@ -100,11 +100,11 @@ userSchema.virtual("projects", {
   foreignField: "creator",
 });
 
-// userSchema.virtual("posts", {
-//   ref: "Project",
-//   localField: "_id", //_id of user
-//   foreignField: "creator",
-// });
+userSchema.virtual("posts", {
+  ref: "Post",
+  localField: "_id", //_id of user
+  foreignField: "writer_id",
+});
 
 userSchema.virtual("comments", {
   ref: "Comment",

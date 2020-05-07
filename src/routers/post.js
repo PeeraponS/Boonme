@@ -1,31 +1,31 @@
 const express = require("express");
 const router = new express.Router();
 const Project = require("../models/project");
-const Comment = require("../models/comment");
+const Post = require("../models/post");
 const auth = require("../middleWare/auth");
 
 // Create new comment
-router.post("/projects/:projectId/comment", auth, async (req, res) => {
+router.post("/projects/:projectId/post", auth, async (req, res) => {
   try {
     const user = req.user;
 
-    const comment = new Comment({
+    const post = new Post({
       text: req.body.text,
-      rating_score: req.body.rating_score,
-      commentator_id: user._id,
+      images: req.body.images,
+      writer_id: user._id,
       project_id: req.params.projectId,
     });
 
-    await comment.save();
+    await post.save();
 
-    res.status(200).send(comment);
+    res.status(200).send(post);
   } catch (error) {
     res.status(400).send({ datasent: req.body, error });
   }
 });
 
-// Get all comment in one specific project
-router.get("/projects/:projectId/comment", auth, async (req, res) => {
+// Get all post in one specific project
+router.get("/projects/:projectId/post", auth, async (req, res) => {
   try {
     // find project
     const project = await Project.findById(req.params.projectId);
@@ -33,11 +33,11 @@ router.get("/projects/:projectId/comment", auth, async (req, res) => {
     // find commment related to that project
     await project
       .populate({
-        path: "comments",
+        path: "posts",
       })
       .execPopulate();
     res.send({
-      comments: project.comments,
+      posts: project.posts,
     });
   } catch (error) {
     res.status(400).send(error);

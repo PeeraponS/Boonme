@@ -89,6 +89,12 @@ projectSchema.virtual("comments", {
   foreignField: "project_id",
 });
 
+projectSchema.virtual("posts", {
+  ref: "Post",
+  localField: "_id", //_id of project
+  foreignField: "project_id",
+});
+
 // middle ware before
 projectSchema.pre("save", async function (next) {
   // edit some variable before saving to the mongoDb
