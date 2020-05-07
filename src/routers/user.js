@@ -5,7 +5,27 @@ const User = require("../models/user");
 const auth = require("../middleWare/auth");
 const { checkBalance } = require("../../connectBlockchain/Mytoken");
 const multer = require("multer");
-// const sharp = require("sharp");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + file.originalname);
+  },
+});
+const upload = multer({
+  limits: {
+    fileSize: 1000000,
+  },
+  fileFilter(req, file, callback) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return callback(new Error("Please upload an image"));
+    }
+    // callback(new Error('plase upload an image'))
+    callback(undefined, true);
+  },
+  storage,
+});
 
 router.post("/users", async (req, res) => {
   try {
@@ -85,7 +105,7 @@ router.patch("/users/me/update", auth, async (req, res) => {
     // const user = await User.findById(req.params.id);
     const user = req.user;
     updates.forEach((key) => (user[key] = req.body[key]));
-    user.save();
+    await user.save();
 
     if (!user) {
       return res.status(404).send();
@@ -106,41 +126,21 @@ router.delete("/users/me", auth, async (req, res) => {
   }
 });
 
-const upload = multer({
-  limits: {
-    fileSize: 1000000,
+router.post(
+  "/users/me/uploadavatar",
+  auth,
+  upload.single("avatar"),
+  async (req, res) => {
+    // access file upload and assign to avatar
+    req.user.avatar = req.file;
+    console.log(req.file);
+    // await req.user.save();
+    res.send("uploaded");
   },
-  fileFilter(req, file, callback) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      return callback(new Error("Please upload an image"));
-    }
-
-    // callback(new Error('plase upload an image'))
-    callback(undefined, true);
-  },
-});
-// router.post(
-//   "/users/me/uploadavatar",
-//   auth,
-//   upload.single("avatar"),
-//   async (req, res) => {
-//     const buffer = await sharp(req.file.buffer)
-//       .png()
-//       .resize({
-//         width: 250,
-//         height: 250,
-//       })
-//       .toBuffer();
-
-//     // access file upload and assign to avatar
-//     req.user.avatar = buffer;
-//     await req.user.save();
-//     res.send();
-//   },
-//   (error, req, res, next) => {
-//     res.status(400).send({ error: error.message });
-//   }
-// );
+  (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+  }
+);
 
 router.delete("/users/me/uploadavatar", auth, async (req, res) => {
   req.user.avatar = undefined;

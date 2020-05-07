@@ -30,26 +30,9 @@ router.post("/erc20token/buytoken", auth, async (req, res) => {
 
     // buy token
     await buytoken(user.bc_account.address, goodcoinValue);
-
-    res.status(200).send();
-  } catch (error) {
-    res.status(400).send({ datasent: req.body, error });
-  }
-});
-
-router.post("/erc20token/buytoken", auth, async (req, res) => {
-  try {
-    const user = req.user;
-    const goodcoinValue = req.body.value;
-
-    //check if the user have enough cash to buy erc20token
-    if (user.cash < goodcoinValue)
-      return res
-        .status(400)
-        .send({ error: "you don't have enough of cash for buying goodcoin." });
-
-    // buy token
-    await buytoken(user.bc_account.address, goodcoinValue);
+    user.cash = user.cash - goodcoinValue;
+    console.log(user.cash);
+    user.save();
 
     res.status(200).send();
   } catch (error) {
