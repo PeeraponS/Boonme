@@ -16,35 +16,39 @@ const transferto = async (
   addressTwo,
   transferAmount
 ) => {
-  const contract = new web3.eth.Contract(contractABI.abi, contractAddress, {
-    from: myAddress,
-  });
+  try {
+    const contract = new web3.eth.Contract(contractABI.abi, contractAddress, {
+      from: myAddress,
+    });
 
-  const count = await web3.eth.getTransactionCount(myAddress);
-  const gasPrice = await web3.eth.getGasPrice();
-  const gasLimit = 1000000;
-  const chainId = 4;
+    const count = await web3.eth.getTransactionCount(myAddress);
+    const gasPrice = await web3.eth.getGasPrice();
+    const gasLimit = 1000000;
+    const chainId = 4;
 
-  const rawTransaction = {
-    from: myAddress,
-    nonce: web3.utils.toHex(count),
-    gasPrice: web3.utils.toHex(gasPrice),
-    gasLimit: web3.utils.toHex(gasLimit),
-    to: contractAddress,
-    value: "0x0",
-    data: contract.methods.transfer(addressTwo, transferAmount).encodeABI(),
-    chainId: chainId,
-  };
+    const rawTransaction = {
+      from: myAddress,
+      nonce: web3.utils.toHex(count),
+      gasPrice: web3.utils.toHex(gasPrice),
+      gasLimit: web3.utils.toHex(gasLimit),
+      to: contractAddress,
+      value: "0x0",
+      data: contract.methods.transfer(addressTwo, transferAmount).encodeABI(),
+      chainId: chainId,
+    };
 
-  const tx = new Tx(rawTransaction, { chain: "rinkeby" });
-  tx.sign(Buffer.from(privateKeyOne, "hex"));
-  const serializedTx = tx.serialize();
-  const receipt = await web3.eth.sendSignedTransaction(
-    "0x" + serializedTx.toString("hex")
-  );
+    const tx = new Tx(rawTransaction, { chain: "rinkeby" });
+    tx.sign(Buffer.from(privateKeyOne, "hex"));
+    const serializedTx = tx.serialize();
+    const receipt = await web3.eth.sendSignedTransaction(
+      "0x" + serializedTx.toString("hex")
+    );
 
-  const TxHash = receipt.transactionHash;
-  return TxHash;
+    const TxHash = receipt.transactionHash;
+    return TxHash;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };
 
 module.exports = {

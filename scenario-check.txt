@@ -1,0 +1,6 @@
+transfer
+1. deposit - checked
+2. buy token - checked
+3. check donor balance - checked
+3. check campaign balance - checked
+3. transfer to some campaign - 
