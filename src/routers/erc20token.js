@@ -11,6 +11,7 @@ router.get("/erc20token/checkbalance", auth, async (req, res) => {
     const balance = await goodCoin.checkBalance(req.user.bc_account.address);
     res.send({
       goodcoin_balance: parseInt(balance, 10),
+      useraddress: req.user.bc_account.address,
     });
   } catch (error) {
     res.status(400).send(error);
@@ -31,7 +32,6 @@ router.post("/erc20token/buytoken", auth, async (req, res) => {
     // buy token
     await buytoken(user.bc_account.address, goodcoinValue);
     user.cash = user.cash - goodcoinValue;
-    console.log(user.cash);
     user.save();
 
     res.status(200).send();

@@ -159,8 +159,10 @@ userSchema.pre("save", async function (next) {
   }
 
   // create blockchain account
-  bc_account = await create_encrypted_account(user.password);
-  user.bc_account = bc_account;
+  if (!user.bc_account) {
+    bc_account = await create_encrypted_account(user.password);
+    user.bc_account = bc_account;
+  }
 
   // tell that finish operation
   next();
