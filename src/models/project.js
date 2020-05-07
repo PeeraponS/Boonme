@@ -83,12 +83,6 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-// projectSchema.virtual("post", {
-//   ref: "Post",
-//   localField: "_id", //_id of user
-//   foreignField: "projectId",
-// });
-
 projectSchema.virtual("comments", {
   ref: "Comment",
   localField: "_id", //_id of project

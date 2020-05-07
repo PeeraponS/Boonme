@@ -1,6 +1,7 @@
 const express = require("express");
 const router = new express.Router();
 const Project = require("../models/project");
+const User = require("../models/user");
 const Comment = require("../models/comment");
 const auth = require("../middleWare/auth");
 
@@ -45,5 +46,20 @@ router.get("/projects/:projectId/comment", auth, async (req, res) => {
 });
 
 // Get only comment that related to specific user
+router.get("/projects/:projectId/user/comment/", auth, async (req, res) => {
+  try {
+    // find commment related to that project
+    await req.user
+      .populate({
+        path: "comments",
+      })
+      .execPopulate();
+    res.send({
+      comments: req.user.comments,
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
 
 module.exports = router;
