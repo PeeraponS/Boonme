@@ -98,10 +98,6 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
       project.donors = project.donors.concat({
         donorId: req.user._id,
       });
-    } else {
-      project.donors = project.donors.filter(
-        (donor) => donor.donorId.toString() != req.user._id
-      );
     }
     await project.save();
 
