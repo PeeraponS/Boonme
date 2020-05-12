@@ -1,8 +1,6 @@
 const express = require("express");
 const router = new express.Router();
 const Project = require("../models/project");
-const Post = require("../models/post");
-const Comment = require("../models/comment");
 const auth = require("../middleWare/auth");
 
 const { checkBalance } = require("../../connectBlockchain/Mytoken");
@@ -26,7 +24,6 @@ router.post("/projects", auth, async (req, res) => {
 // GET /projects/?complete=true
 // GET /projects/?project_type=project_type
 router.get("/projects", async (req, res) => {
-  // 50%, no filter
   let query = {};
   if (req.query.project_type) {
     query = {
@@ -37,6 +34,20 @@ router.get("/projects", async (req, res) => {
   try {
     const projects = await Project.find(query);
     res.send(projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// get random campaign
+router.get("/projects/random/:size", async (req, res) => {
+  try {
+    // get all projects
+    const random_projects = await Project.aggregate([
+      { $sample: { size: Number(req.params.size) } },
+    ]);
+
+    res.send(random_projects);
   } catch (error) {
     res.status(500).send(error);
   }
@@ -150,7 +161,6 @@ router.get("/projects/own", auth, async (req, res) => {
 });
 
 router.get("/projects/popular", async (req, res) => {
-  // 50%, no filter
   try {
     const projects = await Project.find({});
     res.send(projects);
