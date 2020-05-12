@@ -67,15 +67,11 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
 
     // transfer to campaign
     const user = req.user;
-
     const decoded_bc = await decrypt(user.bc_account, user.password);
-
     const fromAddress = decoded_bc.address;
     const privateKeyOne = decoded_bc.privateKey.replace(/^0x/, "");
     const campaignAddress = project.bc_address;
     const transferAmount = req.body.donate;
-
-    // this is a problem
     const txHash = await transferto(
       fromAddress,
       privateKeyOne,
@@ -83,19 +79,18 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
       transferAmount
     );
 
-    // store txHash back to database
-    const transaction = new Transaction({
-      tx_hash: txHash,
-      donor_id: user._id,
-      donor_address: fromAddress,
-      project_address: campaignAddress,
-      donation_amount: transferAmount,
-    });
+    // *****************************************************************
+    // *** update value back to these tables, (1. project, 2. transaction) ***
+    // *****************************************************************
 
-    // if blockchain error,
-    await transaction.save();
+    // *** project - table
+    // update donation amount
+    project.donation_amount = project.donation_amount + transferAmount;
+    // update is_completed
+    if (project.donation_amount == project.max_donation_amount)
+      project.is_completed = true;
 
-    // update donors in campaign table if there isn't this donor
+    // update donors
     const isAlreadyDonate = project.donors.filter(
       (donor) => donor.donorId.toString() == req.user._id
     )[0];
@@ -109,6 +104,16 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
       );
     }
     await project.save();
+
+    // *** transaction - table
+    const transaction = new Transaction({
+      tx_hash: txHash,
+      donor_id: user._id,
+      donor_address: fromAddress,
+      project_address: campaignAddress,
+      donation_amount: transferAmount,
+    });
+    await transaction.save();
 
     res.send();
   } catch (error) {
