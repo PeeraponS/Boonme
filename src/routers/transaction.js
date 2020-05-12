@@ -69,7 +69,6 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
     const user = req.user;
 
     const decoded_bc = await decrypt(user.bc_account, user.password);
-    console.log(decoded_bc);
 
     const fromAddress = decoded_bc.address;
     const privateKeyOne = decoded_bc.privateKey.replace(/^0x/, "");
@@ -96,7 +95,19 @@ router.post("/transaction/donate/:projectid", auth, async (req, res) => {
     // if blockchain error,
     await transaction.save();
 
-    // update donors in campaign table
+    // update donors in campaign table if there isn't this donor
+    const isAlreadyDonate = project.donors.filter(
+      (donor) => donor.donorId.toString() == req.user._id
+    )[0];
+    if (!isAlreadyDonate) {
+      project.donors = project.donors.concat({
+        donorId: req.user._id,
+      });
+    } else {
+      project.donors = project.donors.filter(
+        (donor) => donor.donorId.toString() != req.user._id
+      );
+    }
     project.donors = project.donors.concat({
       donorId: user._id,
     });
