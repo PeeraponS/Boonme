@@ -17,6 +17,8 @@ import TX_R from "../Components/TX_R";
 import TX_L from "../Components/TX_L";
 import TX_B from "../Components/TX_B";
 
+import { Ionicons } from "@expo/vector-icons";
+
 const LOGIN = "LOGIN";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -39,7 +41,7 @@ export default function SignIn(props) {
 
       const result = await axios({
         method: "post",
-        url: "https://aqueous-beach-98436.herokuapp.com/users/login",
+        url: "https://limitless-taiga-70780.herokuapp.com/users/login",
         data: {
           email: username,
           password: password,
@@ -49,11 +51,8 @@ export default function SignIn(props) {
         type: LOGIN,
         userData: result.data.user,
       });
-      // console.log(result.data);
+      console.log(result.data);
       SaveDataToStorage(result.data.token, result.data.user._id);
-      // console.log("token");
-      // console.log(result.data.token);
-      // console.log(result.data);
 
       setTextLoginBtn("เข้าสู่ระบบ");
       setIsLoad(0);
@@ -61,7 +60,7 @@ export default function SignIn(props) {
       if (result.data.user.userpin) {
         props.navigation.navigate("Drawer");
       } else {
-        props.navigation.navigate("PinCreate");
+        props.navigation.navigate("GetInfo");
       }
       // console.log(result.data);
     } catch (err) {
@@ -92,41 +91,47 @@ export default function SignIn(props) {
     <View style={styles.container}>
       <View
         style={{
-          paddingTop: getStatusBarHeight(),
+          paddingTop: getStatusBarHeight() + 40,
           flex: 1,
-          justifyContent: "center",
+          justifyContent: "space-between",
           alignItems: "flex-start",
-          //   backgroundColor: "salmon",
-          width: "78%",
+          // backgroundColor: "salmon",
+          paddingHorizontal: "10%",
+          width: "100%",
+          flexDirection: "row",
         }}
       >
-        <TX_L style={{ fontSize: 34, marginTop: 10 }}>เข้าสู่ระบบ</TX_L>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            props.navigation.navigate("FirstPage");
+          }}
+        >
+          <Ionicons name="ios-arrow-round-back" size={40} />
+        </TouchableWithoutFeedback>
+        <TX_L style={{ fontSize: 34 }}>เข้าสู่ระบบ</TX_L>
       </View>
 
       <KeyboardAvoidingView
-        behavior="padding"
         style={{
-          flex: 3,
+          flex: 4,
           flexDirection: "column",
           width: "100%",
           alignItems: "center",
           backgroundColor: "white",
           borderTopLeftRadius: 8,
           borderTopRightRadius: 8,
-          // elevation: 20
         }}
       >
         <View style={{ width: "100%", alignItems: "center" }}>
           <View
             style={{
-              width: "78%",
-              marginTop: 40,
+              width: "80%",
               alignItems: "center",
               // backgroundColor: "green"
             }}
           >
             <View style={styles.textInputContainer}>
-              <TX_R style={{ color: "#555555", top: 5, fontSize: 14 }}>
+              <TX_R style={{ color: "#555555", top: 10, fontSize: 14 }}>
                 Username
               </TX_R>
               <TextInput
@@ -136,7 +141,7 @@ export default function SignIn(props) {
               />
             </View>
             <View style={styles.textInputContainer}>
-              <TX_R style={{ color: "#555555", top: 5, fontSize: 14 }}>
+              <TX_R style={{ color: "#555555", top: 10, fontSize: 14 }}>
                 Password
               </TX_R>
               <TextInput
@@ -197,10 +202,11 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: "100%",
-    height: 50,
+    height: 60,
     borderBottomWidth: 0.5,
     fontSize: 20,
     borderColor: "black",
+    paddingTop: 20,
   },
   textInputactive: {
     width: "100%",
@@ -211,18 +217,18 @@ const styles = StyleSheet.create({
   },
   textInputContainer: {
     width: "100%",
-    marginTop: 10,
+    marginTop: 5,
   },
   button: {
-    width: "78%",
-    height: 60,
-    // backgroundColor: "salmon",
+    width: "80%",
+    height: 56,
+    backgroundColor: "salmon",
     justifyContent: "center",
     alignItems: "center",
-    margin: 10,
+    margin: 5,
+    borderRadius: 28,
+    elevation: 1,
     marginTop: 40,
-    borderRadius: 8,
-    elevation: 3,
   },
   alert: {
     width: 400,

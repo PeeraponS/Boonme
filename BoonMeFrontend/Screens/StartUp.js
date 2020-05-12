@@ -3,22 +3,69 @@ import {
   View,
   ActivityIndicator,
   StyleSheet,
-  AsyncStorage
+  AsyncStorage,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useDispatch, useSelector } from "react-redux";
+import { GETTOKEN, LOGIN } from "../Store/Action/UserAction";
+import axios from "axios";
 
-const StartUp = props => {
+const StartUp = (props) => {
+  const dispatch = useDispatch();
+  const userName = useSelector((state) => state.user.name);
+  const getUserByToken = async (token) => {
+    let url = `https://limitless-taiga-70780.herokuapp.com/users/me`;
+    let Authorization = `Bearer ${token}`;
+
+    try {
+      const result = await axios({
+        method: "get",
+        url,
+        headers: {
+          Authorization,
+        },
+      });
+      return result;
+    } catch (err) {
+      console.log("err");
+      console.log(err);
+    }
+  };
+
+  const tryLogin = async () => {
+    const userData = await AsyncStorage.getItem("userData");
+
+    if (!userData) {
+      props.navigation.navigate("UserAuthen");
+      return;
+    }
+    const tranformedData = JSON.parse(userData);
+    const { token } = tranformedData;
+    // console.log(token);
+
+    dispatch({
+      type: GETTOKEN,
+      token: token,
+    });
+
+    const result = await getUserByToken(token);
+
+    dispatch({
+      type: LOGIN,
+      userData: result.data,
+    });
+    // console.log(result.data);
+    // if (!userName) {
+    //   props.navigation.navigate("GetInfo");
+    //   return;
+    // }
+
+    props.navigation.navigate("Drawer");
+
+    return;
+  };
+
   useEffect(() => {
-    const tryLogin = async () => {
-      const userData = await AsyncStorage.getItem("userData");
-      if (!userData) {
-        props.navigation.navigate("UserAuthen");
-        return;
-      }
-      const tranformedData = JSON.parse(userData);
-      const { token, userId } = tranformedData;
-      props.navigation.navigate("Drawer");
-    };
     tryLogin();
   }, []);
 
@@ -31,7 +78,7 @@ const StartUp = props => {
           width: "100%",
           height: "100%",
           justifyContent: "center",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <ActivityIndicator size="large" color="white" />

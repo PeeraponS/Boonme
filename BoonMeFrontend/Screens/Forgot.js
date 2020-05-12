@@ -7,6 +7,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import TX_R from "../Components/TX_R";
 import TX_L from "../Components/TX_L";
 
+import { Ionicons } from "@expo/vector-icons";
+
 export default function Forgot(props) {
   return (
     <View
@@ -15,53 +17,63 @@ export default function Forgot(props) {
         justifyContent: "flex-start",
         alignItems: "center",
         backgroundColor: "white",
-        width: "100%"
+        width: "100%",
       }}
     >
       <View
         style={{
-          paddingTop: getStatusBarHeight(),
+          paddingTop: getStatusBarHeight() + 40,
           flex: 1,
-          justifyContent: "center",
+          justifyContent: "space-between",
           alignItems: "flex-start",
           //   backgroundColor: "salmon",
-          width: "78%"
+          paddingHorizontal: "10%",
+          width: "100%",
+          flexDirection: "row",
         }}
       >
-        <TX_L style={{ fontSize: 34, marginTop: 10 }}>ลืมรหัสผ่าน</TX_L>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            props.navigation.navigate("FirstPage");
+          }}
+        >
+          <Ionicons name="ios-arrow-round-back" size={40} />
+        </TouchableWithoutFeedback>
+        <TX_L style={{ fontSize: 34 }}>ลืมรหัสผ่าน</TX_L>
       </View>
       <KeyboardAvoidingView
-        behavior="padding"
+        // behavior="padding"
         style={{
-          flex: 3,
+          flex: 8,
           flexDirection: "column",
           width: "100%",
           alignItems: "center",
           backgroundColor: "white",
           borderTopLeftRadius: 8,
-          borderTopRightRadius: 8
+          borderTopRightRadius: 8,
           // elevation: 20
         }}
       >
         <View style={{ width: "100%", alignItems: "center" }}>
           <View
             style={{
-              width: "78%",
+              width: "80%",
               marginTop: 100,
-              alignItems: "center"
-              // backgroundColor: "green"
+              alignItems: "center",
             }}
           >
             <View style={{ width: "100%", marginTop: 10 }}>
-              <TX_R style={{ color: "#555555", top: 5, fontSize: 14 }}>
+              <TX_R style={{ color: "#555555", top: 10, fontSize: 14 }}>
                 Email
               </TX_R>
               <TextInput
                 style={{
                   width: "100%",
-                  height: 50,
+                  height: 60,
                   borderBottomWidth: 0.5,
-                  fontSize: 20
+                  fontSize: 20,
+                  borderColor: "black",
+                  paddingTop: 20,
                 }}
               />
             </View>
@@ -71,15 +83,15 @@ export default function Forgot(props) {
             colors={["#40c9ff", "#4a40ff"]}
             start={[1, -1.2]}
             style={{
-              width: "78%",
-              height: 60,
-              // backgroundColor: "salmon",
+              width: "80%",
+              height: 56,
+              backgroundColor: "salmon",
               justifyContent: "center",
               alignItems: "center",
-              margin: 10,
+              margin: 5,
+              borderRadius: 28,
+              elevation: 1,
               marginTop: 40,
-              borderRadius: 8,
-              elevation: 3
             }}
           >
             <TX_R style={{ fontSize: 18, color: "white" }}>รีเซ็ตรหัสผ่าน</TX_R>
