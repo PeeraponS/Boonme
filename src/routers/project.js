@@ -225,6 +225,7 @@ router.patch("/projects/:projectId/favourite", auth, async (req, res) => {
     }
 
     // check favourite status if already fav, pop the user out, if not, attached the user to project
+    let isFav = false;
     const isAlreadyFav = project.followers.filter(
       (follower) => follower.followerId.toString() == req.user._id
     )[0];
@@ -232,13 +233,14 @@ router.patch("/projects/:projectId/favourite", auth, async (req, res) => {
       project.followers = project.followers.concat({
         followerId: req.user._id,
       });
+      isFav = true;
     } else {
       project.followers = project.followers.filter(
         (follower) => follower.followerId.toString() != req.user._id
       );
     }
     project.save();
-    res.send(project);
+    res.send(isFav);
   } catch (error) {
     res.status(400).send(error);
   }
