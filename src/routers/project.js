@@ -184,6 +184,25 @@ router.get("/projects/:id", auth, async (req, res) => {
   }
 });
 
+// check if user has already favourite project?
+router.get("/projects/:projectId/favourite", auth, async (req, res) => {
+  const projectId = req.params.projectId;
+  try {
+    // find project
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).send();
+
+    // check favourite status
+    const isFav = project.followers.filter(
+      (follower) => follower.followerId.toString() == req.user._id
+    )[0];
+
+    return res.status(200).send(isFav ? true : false);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 // Favourize by some user
 router.patch("/projects/:projectId/favourite", auth, async (req, res) => {
   // add some property that doesn't exits in the first place
@@ -197,16 +216,27 @@ router.patch("/projects/:projectId/favourite", auth, async (req, res) => {
   }
 
   try {
+    //find project
     const project = await Project.findOne({
       _id: req.params.projectId,
     });
-
     if (!project) {
       return res.status(404).send();
     }
-    project.followers = project.followers.concat({
-      followerId: req.user._id,
-    });
+
+    // check favourite status if already fav, pop the user out, if not, attached the user to project
+    const isAlreadyFav = project.followers.filter(
+      (follower) => follower.followerId.toString() == req.user._id
+    )[0];
+    if (!isAlreadyFav) {
+      project.followers = project.followers.concat({
+        followerId: req.user._id,
+      });
+    } else {
+      project.followers = project.followers.filter(
+        (follower) => follower.followerId.toString() != req.user._id
+      );
+    }
     project.save();
     res.send(project);
   } catch (error) {
