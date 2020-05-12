@@ -1,11 +1,10 @@
 import React from "react";
-import { View, TouchableWithoutFeedback } from "react-native";
+import { View, TouchableWithoutFeedback, TextInput } from "react-native";
 import { getStatusBarHeight } from "react-native-status-bar-height";
-
 import { Ionicons } from "@expo/vector-icons";
 import TX_R from "../Components/TX_R";
 
-const Feed = (props) => {
+const Search = (props) => {
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <View
@@ -24,20 +23,30 @@ const Feed = (props) => {
       >
         <TouchableWithoutFeedback
           onPress={() => {
-            props.navigation.openDrawer();
+            props.navigation.goBack();
           }}
         >
-          <Ionicons name="ios-menu" size={30} />
+          <Ionicons
+            name="ios-arrow-round-back"
+            size={34}
+            style={{ width: 30 }}
+          />
         </TouchableWithoutFeedback>
-        <View>
-          <TX_R style={{ fontSize: 18, top: 2 }}>อัปเดต</TX_R>
-        </View>
-        <TouchableWithoutFeedback>
-          <Ionicons name="md-settings" size={24} />
-        </TouchableWithoutFeedback>
+        <TextInput
+          autoFocus={true}
+          style={{
+            width: "88%",
+            height: 45,
+            borderRadius: 12,
+            backgroundColor: "#eee",
+            fontSize: 20,
+            borderColor: "black",
+            paddingHorizontal: 10,
+          }}
+        />
       </View>
     </View>
   );
 };
 
-export default Feed;
+export default Search;

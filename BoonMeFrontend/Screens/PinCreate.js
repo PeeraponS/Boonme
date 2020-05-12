@@ -6,7 +6,7 @@ import TX_R from "../Components/TX_R";
 
 import axios from "axios";
 
-export default PinCreate = props => {
+export default PinCreate = (props) => {
   const [code, setCode] = useState();
   const [text, setText] = useState("");
 
@@ -16,59 +16,38 @@ export default PinCreate = props => {
   const [pin2, setPin2] = useState("");
 
   const dispatch = useDispatch();
-  const userData = useSelector(state => state.user.userId);
-  //   const userPin = useSelector(state => state.user.userpin);
-  // const pinInput = React.createRef()
+  const userTokens = useSelector((state) => state.user.token);
   const pinInput = useRef(null);
 
   // sent Data back to Backend server
-  const updateUserpin = async pin2 => {
-    // console.log("updateUserpin -- PinCreater");
-    // console.log("userData");
-    // console.log(userData);
-    // console.log("pin2");
-    // console.log(pin2);
+  const updateUserpin = async (pin2) => {
+    let url = `https://limitless-taiga-70780.herokuapp.com/users/me/update`;
+    let usertoken = userTokens;
+    let Authorization = `Bearer ${usertoken}`;
+    console.log("Authorization");
+    console.log(Authorization);
     try {
       const result = await axios({
-        method: "patch",
-        url: `https://aqueous-beach-98436.herokuapp.com/users/${userData}/updatepin`,
+        method: "PATCH",
+        url: url,
+        headers: {
+          Authorization,
+        },
         data: {
-          userpin: pin2
-        }
+          userpin: pin2,
+          name: props.route.params.name,
+        },
       });
       dispatch({
         type: LOGIN,
-        userData: result.data
+        userData: result.data,
       });
-
-      //   console.log(result.data);
     } catch (err) {
       console.log(err);
-      // console.log(err.massage);
     }
   };
 
-  // Send a POST request
-  // const updateUserpin = async () => {
-  //   let userpin = 4822; //change 'userAuthenToken' to 'user_token'
-  //   let usertoken =
-  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTdmNGMzNDA5MDFmYzAwMDQwODkwY2YiLCJpYXQiOjE1ODU0MDA4ODR9.zNuwxOYZATV5bYevRWNOcsE0oK9Wqcv8rxtKEMGIcqE";
-  //   let Authorization = `Bearer ${usertoken}`; //change 'userAuthenToken' to 'user_token'
-  //   const result = await axios({
-  //     method: "patch",
-  //     url: `https://aqueous-beach-98436.herokuapp.com/users/5e7f4c340901fc00040890cf/updatepin`,
-  //     data: {
-  //       userpin
-  //     },
-  //     headers: {
-  //       Authorization
-  //     }
-  //   });
-  //   console.log(result.data);
-  // };
-  // updateUserpin();
-
-  const _checkCode = code => {
+  const _checkCode = (code) => {
     if (isPin1 == true) {
       setPin1(code);
       setText("round 1");
@@ -87,6 +66,7 @@ export default PinCreate = props => {
         setTitle("กรุณาใส่ Pin ใหม่");
       } else {
         updateUserpin(code);
+        console.log(props.route.params.name);
         Keyboard.dismiss();
         props.navigation.navigate("Drawer");
       }
@@ -95,6 +75,17 @@ export default PinCreate = props => {
 
   return (
     <View style={styles.container}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          padding: 30,
+        }}
+      >
+        <TX_L style={{ fontSize: 34 }}>สร้างพินของคุณ</TX_L>
+      </View>
       <View style={styles.section}>
         <TX_R style={styles.title}>{Title}</TX_R>
         <SmoothPinCodeInput
@@ -105,21 +96,21 @@ export default PinCreate = props => {
                 width: 10,
                 height: 10,
                 borderRadius: 20,
-                backgroundColor: "black"
+                backgroundColor: "black",
               }}
             ></View>
           }
           cellStyle={{
             borderBottomWidth: 1.5,
-            borderColor: "gray"
+            borderColor: "gray",
           }}
           cellStyleFocused={{
-            borderColor: "black"
+            borderColor: "black",
           }}
           ref={pinInput}
           value={code}
           codeLength={4}
-          onTextChange={code => setCode(code)}
+          onTextChange={(code) => setCode(code)}
           onFulfill={_checkCode}
           onBackspace={() => console.log("No more back.")}
         />
@@ -133,17 +124,19 @@ export default PinCreate = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   section: {
+    flex: 2,
     alignItems: "center",
-    margin: 16
+    margin: 16,
+    paddingTop: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     marginBottom: 8,
-    marginBottom: 40
-  }
+    marginBottom: 40,
+  },
 });

@@ -41,9 +41,14 @@ function Img({ source }) {
 function Dots() {
   const step = Animated.divide(scrollX, width);
   return FirstPageImg.map((item, index) => {
-    const opacity = step.interpolate({
+    const colorDot = step.interpolate({
       inputRange: [index - 1, index, index + 1],
-      outputRange: [0.4, 1, 0.4],
+      outputRange: ["#ccc", "#ff0055", "#ccc"],
+      extrapolate: "clamp",
+    });
+    const widthDot = step.interpolate({
+      inputRange: [index - 1, index, index + 1],
+      outputRange: [6, 24, 6],
       extrapolate: "clamp",
     });
     return (
@@ -51,12 +56,12 @@ function Dots() {
         key={item.id}
         style={{
           height: 6,
-          width: 6,
+          width: widthDot,
           borderRadius: 3,
-          backgroundColor: "grey",
+          backgroundColor: colorDot,
           marginHorizontal: 4,
           bottom: 15,
-          opacity: opacity,
+
           //   position: "absolute"
         }}
       ></Animated.View>
@@ -71,15 +76,13 @@ export default function FirstPage(props) {
   return (
     <SafeAreaView style={[styles.container]}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <TX_L style={{ fontSize: 24, marginTop: 40 }}>
-          ร่วมสร้างสังคมให้น่าอยู่ขึ้น
-        </TX_L>
+        <TX_L style={{ fontSize: 32, marginTop: 40 }}>บุญมี.com</TX_L>
       </View>
       <View
         style={{
-          flex: 3,
+          flex: 4,
           justifyContent: "center",
-          //   backgroundColor: "salmon",
+          // backgroundColor: "#fafafa",
           width: "100%",
           height: "100%",
         }}
@@ -104,7 +107,7 @@ export default function FirstPage(props) {
           style={{
             width: "100%",
             height: 10,
-            // backgroundColor: "salmon",
+            // backgroundColor: "#fafafa",
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "row",
@@ -119,6 +122,7 @@ export default function FirstPage(props) {
           justifyContent: "center",
           alignItems: "center",
           width: "100%",
+          // backgroundColor: "#fafafa",
         }}
       >
         <TouchableWithoutFeedback
@@ -140,11 +144,11 @@ export default function FirstPage(props) {
           }}
         >
           <LinearGradient
-            colors={["#ffffff", "#ffffff"]}
+            colors={["#1b262c", "#1b262c"]}
             start={[1, -1.2]}
             style={styles.button}
           >
-            <TX_R style={{ fontSize: 18 }}>สมัครบัญชี</TX_R>
+            <TX_R style={{ fontSize: 18, color: "#fff" }}>สมัครบัญชี</TX_R>
           </LinearGradient>
         </TouchableWithoutFeedback>
         <TX_R
@@ -171,13 +175,13 @@ const styles = StyleSheet.create({
     paddingTop: getStatusBarHeight(),
   },
   button: {
-    width: "78%",
-    height: 60,
+    width: "80%",
+    height: 56,
     backgroundColor: "salmon",
     justifyContent: "center",
     alignItems: "center",
-    margin: 10,
-    borderRadius: 8,
-    elevation: 3,
+    margin: 5,
+    borderRadius: 28,
+    elevation: 1,
   },
 });

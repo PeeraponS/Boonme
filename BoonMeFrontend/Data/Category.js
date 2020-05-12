@@ -2,37 +2,37 @@ const Category = [
   {
     id: "1",
     name: "",
-    title: "การศึกษา"
+    title: "การศึกษา",
   },
   {
     id: "2",
     name: "",
-    title: "โรงพยาบาล"
+    title: "โรงพยาบาล",
   },
   {
     id: "3",
     name: "",
-    title: "ผู้สูงอายุ"
+    title: "ผู้สูงอายุ",
   },
   {
     id: "4",
     name: "",
-    title: "ผูพิการ"
+    title: "ผู้พิการ",
   },
   {
     id: "5",
     name: "",
-    title: "สัตว์"
+    title: "สัตว์โลก",
   },
   {
     id: "6",
     name: "",
-    title: "สิ่งแวดล้อม"
+    title: "สิ่งแวดล้อม",
   },
   {
     id: "7",
     name: "",
-    title: "สังคมสงเคราห์"
-  }
+    title: "สังคม",
+  },
 ];
 export default Category;

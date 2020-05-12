@@ -11,37 +11,116 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { getStatusBarHeight } from "react-native-status-bar-height";
+import SmoothPinCodeInput from "react-native-smooth-pincode-input";
+import sha256 from "sha256";
+import axios from "axios";
 
 import TX_R from "../Components/TX_R";
 import TX_B from "../Components/TX_B";
-
-import {
-  AntDesign,
-  MaterialCommunityIcons,
-  FontAwesome,
-  Ionicons,
-} from "@expo/vector-icons";
-
-import { useSelector } from "react-redux";
 import TX_L from "../Components/TX_L";
 
-const Wallet = () => {
-  function buttonscroll() {
-    if (amount >= 1) {
-      console.log(amount);
-      scroll.current.scrollTo({
-        x: (92 * width) / 100,
-        y: 0,
-        animated: true,
+import {
+  MaterialCommunityIcons,
+  FontAwesome5,
+  Ionicons,
+  SimpleLineIcons,
+} from "@expo/vector-icons";
+import { useSelector, useDispatch } from "react-redux";
+
+const Wallet = (props) => {
+  const pinInput = useRef(null);
+  const [code, setCode] = useState();
+  const [text, setText] = useState("");
+  const userPin = useSelector((state) => state.user.userpin);
+  const userToken = useSelector((state) => state.user.token);
+
+  const _checkCode = async (code) => {
+    const encryptedCode_Mockup = await sha256.x2(userPin);
+    const encryptedinputCode = await sha256.x2(code);
+
+    if (encryptedCode_Mockup != encryptedinputCode) {
+      pinInput.current.shake().then(() => setCode(""));
+      setText("Pin ไม่ถูกต้อง");
+    } else {
+      console.log("loading");
+      await buyGoodcoin(); //10 hour ,
+      console.log("laoded");
+      setText("");
+      setVisible(false);
+      refreshUserInfo();
+      setCode();
+    }
+  };
+
+  const buyGoodcoin = async () => {
+    let url = `https://limitless-taiga-70780.herokuapp.com/users/me/depositcash`;
+    let Authorization = `Bearer ${userToken}`;
+    console.log(Authorization);
+    try {
+      const result = await axios({
+        method: "post",
+        url,
+        data: {
+          deposit: Number(amount),
+        },
+        headers: {
+          Authorization,
+        },
       });
-      setAlertshow("");
-    }
-    if (amount < 1) {
+
       console.log(amount);
-      setAlertshow("กรุณาใส่จำนวน 1 บาทขึ้นไป");
-      txinput.current.clear();
+    } catch (err) {
+      console.log(err);
     }
+  };
+
+  const LOGIN = "LOGIN";
+  const dispatch = useDispatch();
+  const refreshUserInfo = async () => {
+    let url = `https://limitless-taiga-70780.herokuapp.com/users/me`;
+    let Authorization = `Bearer ${userToken}`;
+
+    try {
+      const result = await axios({
+        method: "get",
+        url,
+        headers: {
+          Authorization,
+        },
+      });
+
+      dispatch({
+        type: LOGIN,
+        userData: result.data,
+      });
+    } catch (err) {
+      console.log("err");
+      console.log(err);
+    }
+  };
+
+  function buttonscroll() {
+    scroll.current.scrollTo({
+      x: width,
+      y: 0,
+      animated: true,
+    });
   }
+  function buttonscroll2() {
+    scroll.current.scrollTo({
+      x: width * 2,
+      y: 0,
+      animated: true,
+    });
+  }
+  function buttonscrollback() {
+    scroll.current.scrollTo({
+      x: 0,
+      y: 0,
+      animated: true,
+    });
+  }
+
   const [alertshow, setAlertshow] = useState("");
   const [amount, setAmount] = useState();
   const [visible, setVisible] = useState(false);
@@ -51,408 +130,399 @@ const Wallet = () => {
   const { width } = Dimensions.get("window");
 
   const userCoin = useSelector((state) => state.user.amountCoin);
+
   return (
     <View style={{ flex: 1, backgroundColor: "white", alignItems: "center" }}>
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={visible}
-        hardwareAccelerated={true}
-      >
-        <KeyboardAvoidingView
-          behavior="padding"
+      {/* modal 1  */}
+      <Modal visible={visible} transparent={true} animationType="fade">
+        <View
           style={{
-            justifyContent: "center",
-            alignItems: "center",
             height: "100%",
+            width: "100%",
+            backgroundColor: "#00000050",
+          }}
+        ></View>
+      </Modal>
+      <Modal visible={visible} transparent={true} animationType="slide">
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setVisible(false);
+          }}
+        >
+          <View
+            style={{
+              height: 120 + 92 - getStatusBarHeight(),
+              width: "100%",
+              // backgroundColor: "#00000050",
+            }}
+          ></View>
+        </TouchableWithoutFeedback>
+        <View
+          style={{
+            width: "100%",
+            height: 70,
+            backgroundColor: "#fff",
+            alignItems: "center",
+            flexDirection: "row",
+            paddingHorizontal: 20,
+            justifyContent: "space-between",
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
           }}
         >
           <TouchableWithoutFeedback
             onPress={() => {
               setVisible(false);
-              setAmount("");
             }}
           >
-            <View
-              style={{
-                height: 1000,
-                width: "100%",
-                backgroundColor: "black",
-                position: "absolute",
-                opacity: 0.3,
-              }}
-            ></View>
+            <Ionicons
+              name="ios-arrow-round-back"
+              size={34}
+              style={{ width: 30 }}
+            />
           </TouchableWithoutFeedback>
-
-          <View
-            style={{
-              width: (92 * width) / 100,
-              height: 400,
-              backgroundColor: "white",
-              top: 140,
-              borderRadius: 14,
-              elevation: 8,
-              alignItems: "center",
-            }}
-          >
+          <View>
+            <TX_R style={{ fontSize: 26 }}>เติมเหรียญ</TX_R>
+          </View>
+        </View>
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          ref={scroll}
+          scrollEnabled={false}
+        >
+          <View style={{ width: width, flex: 1 }}>
             <View
               style={{
-                height: 100,
-                width: "86%",
-                // backgroundColor: "salmon",
+                backgroundColor: "#fff",
+                flex: 1,
+                paddingHorizontal: 20,
                 alignItems: "flex-end",
-                justifyContent: "center",
               }}
             >
-              <TX_R style={{ fontSize: 34 }}>เติมเงิน</TX_R>
-            </View>
-            <ScrollView
-              showsHorizontalScrollIndicator={false}
-              ref={scroll}
-              horizontal
-              scrollEnabled={false}
-              snapToAlignment="center"
-              // snapToInterval={(92 * width) / 100}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <View
-                  style={{ width: (92 * width) / 100, alignItems: "center" }}
-                >
-                  <View style={{ height: 200, width: "86%" }}>
-                    <View
-                      style={{
-                        width: "100%",
-                        marginTop: 100,
-                      }}
-                    >
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <TX_R
-                          style={{ color: "#555555", top: 5, fontSize: 14 }}
-                        >
-                          จำนวน ( บาท )
-                        </TX_R>
-                        <TX_R style={{ color: "red", top: 5, fontSize: 14 }}>
-                          {alertshow}
-                        </TX_R>
-                      </View>
-                      <TextInput
-                        ref={txinput}
-                        onChangeText={setAmount}
-                        keyboardType="decimal-pad"
-                        selectTextOnFocus={true}
-                        style={{
-                          width: "100%",
-                          height: 50,
-                          borderBottomWidth: 0.5,
-                          fontSize: 20,
-                          borderColor: "black",
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      height: 100,
-                      width: "100%",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TouchableWithoutFeedback
-                      onPress={() => {
-                        buttonscroll();
-                      }}
-                    >
-                      <LinearGradient
-                        colors={["#40c9ff", "#4a40ff"]}
-                        start={[1, -1.2]}
-                        style={{
-                          width: "86%",
-                          height: 60,
-                          backgroundColor: "salmon",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          margin: 10,
-                          borderRadius: 8,
-                          elevation: 3,
-                        }}
-                      >
-                        <TX_R style={{ fontSize: 18, color: "white" }}>
-                          ต่อไป
-                        </TX_R>
-                      </LinearGradient>
-                    </TouchableWithoutFeedback>
-                  </View>
-                </View>
-                <View
-                  style={{ width: (92 * width) / 100, alignItems: "center" }}
-                >
-                  <View style={{ height: 200, width: "86%" }}>
-                    <View
-                      style={{
-                        width: "100%",
-                        marginTop: 100,
-                      }}
-                    >
-                      <TX_R style={{ color: "#555555", top: 5, fontSize: 14 }}>
-                        จำนวน ( บาท )
-                      </TX_R>
-                      <TextInput
-                        keyboardType="decimal-pad"
-                        selectTextOnFocus={true}
-                        style={{
-                          width: "100%",
-                          height: 50,
-                          borderBottomWidth: 0.5,
-                          fontSize: 20,
-                          borderColor: "black",
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      height: 100,
-                      width: "100%",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TouchableWithoutFeedback
-                      onPress={() => {
-                        scroll.current.scrollTo({
-                          x: ((92 * width) / 100) * 2,
-                          y: 0,
-                        });
-                      }}
-                    >
-                      <LinearGradient
-                        colors={["#40c9ff", "#4a40ff"]}
-                        start={[1, -1.2]}
-                        style={{
-                          width: "86%",
-                          height: 60,
-                          backgroundColor: "salmon",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          margin: 10,
-                          borderRadius: 8,
-                          elevation: 3,
-                        }}
-                      >
-                        <TX_R style={{ fontSize: 18, color: "white" }}>
-                          ต่อไป
-                        </TX_R>
-                      </LinearGradient>
-                    </TouchableWithoutFeedback>
-                  </View>
-                </View>
-                <View
-                  style={{ width: (92 * width) / 100, alignItems: "center" }}
-                >
-                  <View style={{ height: 200, width: "86%" }}>
-                    <View
-                      style={{
-                        width: "100%",
-                        marginTop: 100,
-                      }}
-                    >
-                      <TX_R style={{ color: "#555555", top: 5, fontSize: 14 }}>
-                        จำนวน ( บาท )
-                      </TX_R>
-                      <TextInput
-                        keyboardType="decimal-pad"
-                        selectTextOnFocus={true}
-                        style={{
-                          width: "100%",
-                          height: 50,
-                          borderBottomWidth: 0.5,
-                          fontSize: 20,
-                          borderColor: "black",
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      height: 100,
-                      width: "100%",
-                      alignItems: "center",
-                    }}
-                  >
-                    <LinearGradient
-                      colors={["#40c9ff", "#4a40ff"]}
-                      start={[1, -1.2]}
-                      style={{
-                        width: "86%",
-                        height: 60,
-                        backgroundColor: "salmon",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        margin: 10,
-                        borderRadius: 8,
-                        elevation: 3,
-                      }}
-                    >
-                      <TX_R style={{ fontSize: 18, color: "white" }}>
-                        ต่อไป
-                      </TX_R>
-                    </LinearGradient>
-                  </View>
-                </View>
+              <View style={{ marginTop: 20 }}>
+                <TX_R>จำนวน (บาท)</TX_R>
               </View>
-            </ScrollView>
+              <TextInput
+                onChangeText={setAmount}
+                selectTextOnFocus={true}
+                keyboardType={"numeric"}
+                textAlign="right"
+                style={{
+                  width: "100%",
+                  height: 60,
+                  borderBottomWidth: 0.5,
+                  fontSize: 26,
+                  borderColor: "black",
+                  paddingTop: 20,
+                }}
+              />
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  buttonscroll();
+                }}
+              >
+                <View style={{ flexDirection: "row" }}>
+                  <View
+                    style={{
+                      width: "100%",
+                      height: 60,
+                      backgroundColor: "#1b262c",
+                      marginTop: 40,
+                      borderRadius: 30,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TX_R style={{ fontSize: 20, color: "#fff" }}>ถัดไป</TX_R>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
           </View>
-        </KeyboardAvoidingView>
+          <View style={{ width: width, flex: 1 }}>
+            <View
+              style={{
+                backgroundColor: "#fff",
+                flex: 1,
+                paddingHorizontal: 20,
+                alignItems: "flex-end",
+              }}
+            >
+              <View style={{ marginTop: 20 }}>
+                <TX_R>วิธีชำระเงิน</TX_R>
+              </View>
+              <View
+                style={{
+                  width: "100%",
+                  height: 240,
+                  borderRadius: 12,
+                  backgroundColor: "#eee",
+                  marginTop: 20,
+                }}
+              ></View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    buttonscrollback();
+                  }}
+                >
+                  <View
+                    style={{
+                      width: "48%",
+                      height: 60,
+                      backgroundColor: "#1b262c",
+                      marginTop: 20,
+                      borderRadius: 30,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TX_R style={{ fontSize: 20, color: "#fff" }}>
+                      ย้อนกลับ
+                    </TX_R>
+                  </View>
+                </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    buttonscroll2();
+                  }}
+                >
+                  <View
+                    style={{
+                      width: "48%",
+                      height: 60,
+                      backgroundColor: "#1b262c",
+                      marginTop: 20,
+                      borderRadius: 30,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TX_R style={{ fontSize: 20, color: "#fff" }}>ถัดไป</TX_R>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </View>
+          </View>
+          <View style={{ width: width, flex: 1 }}>
+            <View
+              style={{
+                justifyContent: "center",
+                flex: 1,
+                alignItems: "center",
+                backgroundColor: "#fff",
+              }}
+            >
+              <View style={{ flex: 0.5, alignItems: "center" }}>
+                <TX_R style={{ fontSize: 16, bottom: 20 }}>
+                  ใส่พินเพื่อยืนยัน
+                </TX_R>
+                <SmoothPinCodeInput
+                  password
+                  mask={
+                    <View
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: 20,
+                        backgroundColor: "black",
+                      }}
+                    ></View>
+                  }
+                  cellStyle={{
+                    borderBottomWidth: 1.5,
+                    borderColor: "gray",
+                  }}
+                  cellStyleFocused={{
+                    borderColor: "black",
+                  }}
+                  ref={pinInput}
+                  value={code}
+                  codeLength={4}
+                  onTextChange={(code) => setCode(code)}
+                  onFulfill={_checkCode}
+                  onBackspace={() => console.log("No more back.")}
+                />
+              </View>
+            </View>
+          </View>
+        </ScrollView>
       </Modal>
 
       <View
         style={{
-          height: "35%",
+          paddingTop: getStatusBarHeight(),
+          height: 92,
           width: "100%",
-          backgroundColor: "#ffd30d",
           justifyContent: "space-between",
           alignItems: "center",
-          borderBottomLeftRadius: 8,
-          borderBottomRightRadius: 8,
+          flexDirection: "row",
+          zIndex: 3000,
+          backgroundColor: "#fff",
+          paddingHorizontal: 20,
+          elevation: 1,
+        }}
+      >
+        <TouchableWithoutFeedback
+          onPress={() => {
+            props.navigation.openDrawer();
+          }}
+        >
+          <Ionicons name="ios-menu" size={30} />
+        </TouchableWithoutFeedback>
+        <View>
+          <TX_R style={{ fontSize: 18, top: 2 }}>วอลเล็ท</TX_R>
+        </View>
+        <TouchableWithoutFeedback>
+          <Ionicons name="md-settings" size={24} />
+        </TouchableWithoutFeedback>
+      </View>
+      <View
+        style={{
+          width: "100%",
+          height: 120,
+          justifyContent: "center",
+          alignItems: "center",
+          elevation: 1,
+          backgroundColor: "#fff",
+          paddingBottom: 10,
+        }}
+      >
+        <TX_B style={{ fontSize: 28 }}>{userCoin}</TX_B>
+        <TX_R style={{ color: "#007AFF" }}>เหรียญบุญมี</TX_R>
+      </View>
+
+      <View
+        style={{
+          width: "100%",
+          padding: 10,
+          backgroundColor: "#fff",
+          elevation: 1,
         }}
       >
         <View
           style={{
-            marginTop: getStatusBarHeight(),
-            width: "100%",
-            height: 70,
-            // backgroundColor: "red",
-            alignItems: "center",
-            justifyContent: "space-between",
             flexDirection: "row",
+            justifyContent: "space-evenly",
           }}
         >
-          <View style={{ width: 50, height: "100%" }}></View>
-          {/* <TX_R style={{ fontSize: 18 }}>กระเป๋า</TX_R> */}
-          {/* <Ionicons
-            name="md-settings"
-            size={24}
-            // color="white"
-            style={{
-              margin: 14,
-              marginTop: 16,
-              marginRight: 20
-            }}
-          /> */}
-          {/* <TX_R style={{ fontSize: 24, marginTop: 2, marginRight: 20 }}>
-            กระเป๋าเงิน
-          </TX_R> */}
-        </View>
-        {/* <View style={{ width: "100%" }}>
-          <TX_R style={{ fontSize: 24, top: 5, marginLeft: 20 }}>กระเป๋า</TX_R>
-        </View> */}
-        <LinearGradient
-          colors={["#ffffff", "#40c9ff", "#4a40ff"]}
-          start={[1, -1.2]}
-          style={{
-            width: "94%",
-            height: "80%",
-            marginTop: 20,
-            borderRadius: 20,
-            elevation: 16,
-          }}
-        >
-          <View
-            style={{
-              width: "100%",
-              height: "100%",
-              justifyContent: "center",
-              alignItems: "center",
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setVisible(true);
+              setCode();
             }}
           >
-            <TX_R style={{ fontSize: 16, color: "white" }}>ยอดเงินในระบบ</TX_R>
-            <View style={{ flexDirection: "row" }}>
-              <TX_R style={{ fontSize: 26, color: "white" }}>{userCoin}</TX_R>
-              <TX_R style={{ fontSize: 26, color: "white" }}> MBC.</TX_R>
+            <View style={styles.box}>
+              <MaterialCommunityIcons
+                name="coin"
+                size={24}
+                style={{ marginBottom: 10, marginTop: 3 }}
+              />
+              <TX_R>เติมเหรียญ</TX_R>
             </View>
-          </View>
-        </LinearGradient>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <View style={styles.box}>
+              <SimpleLineIcons
+                name="credit-card"
+                size={28}
+                style={{ marginBottom: 10 }}
+              />
+              <TX_R>วิธีชำระเงิน</TX_R>
+            </View>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <View style={styles.box}>
+              <FontAwesome5
+                name="money-bill-alt"
+                size={24}
+                style={{ marginBottom: 11, marginTop: 3 }}
+              />
+              <TX_R>โอนเงิน</TX_R>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+        <View style={{ padding: 10, marginTop: 20 }}>
+          <TX_R style={{ fontSize: 22 }}>Recent Transactions</TX_R>
+        </View>
       </View>
       <View
         style={{
-          height: "50%",
-          width: "90%",
-          marginTop: 100,
-          // backgroundColor: "#555555",
+          flex: 1,
+          width: "100%",
+          backgroundColor: "#fff",
+          paddingHorizontal: "3%",
         }}
       >
-        <View style={styles.tableColumn}>
-          <View style={styles.tablerow}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                setVisible(true);
-                setAlertshow("");
-              }}
-            >
-              <View style={styles.button}>
-                <MaterialCommunityIcons name="coin" color="black" size={28} />
-                <TX_R style={{ marginTop: 12, fontSize: 16 }}>เติมเงิน</TX_R>
-              </View>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback>
-              <View style={styles.button}>
-                <AntDesign name="swap" color="black" size={28} />
-                <TX_R style={{ marginTop: 12, fontSize: 16 }}>ประวัติ</TX_R>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-          <View style={styles.tablerow}>
-            <TouchableWithoutFeedback>
-              <View style={styles.button}>
-                <AntDesign name="creditcard" color="black" size={28} />
-                <TX_R style={{ marginTop: 12, fontSize: 16 }}>บัตร</TX_R>
-              </View>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback>
-              <View style={styles.button}>
-                <FontAwesome name="money" color="black" size={28} />
-                <TX_R style={{ marginTop: 12, fontSize: 16 }}>ถอนเงิน</TX_R>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View
+            style={{
+              width: "100%",
+              height: 80,
+              borderRadius: 12,
+              backgroundColor: "#eee",
+              marginTop: 10,
+            }}
+          ></View>
+          <View
+            style={{
+              width: "100%",
+              height: 80,
+              borderRadius: 12,
+              backgroundColor: "#eee",
+              marginTop: 10,
+            }}
+          ></View>
+          <View
+            style={{
+              width: "100%",
+              height: 80,
+              borderRadius: 12,
+              backgroundColor: "#eee",
+              marginTop: 10,
+            }}
+          ></View>
+          <View
+            style={{
+              width: "100%",
+              height: 80,
+              borderRadius: 12,
+              backgroundColor: "#eee",
+              marginTop: 10,
+            }}
+          ></View>
+        </ScrollView>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    width: "44%",
-    height: "90%",
-    backgroundColor: "white",
-    margin: 10,
-    borderRadius: 20,
-    elevation: 16,
+  box: {
+    width: 100,
+    height: 120,
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    elevation: 4,
+    marginTop: 5,
     justifyContent: "center",
     alignItems: "center",
-    // borderWidth: 1,
-    // borderColor: "darkgrey"
+    paddingTop: 16,
   },
-  tablerow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "44%",
-    width: "100%",
-    // backgroundColor: "blue"
-  },
-  tableColumn: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    // backgroundColor: "red",
-    width: "100%",
-    height: "100%",
+  box2: {
+    width: 100,
+    height: 120,
+    borderRadius: 12,
+    backgroundColor: "#ffd30d",
+    elevation: 8,
+    marginTop: 10,
   },
 });
 

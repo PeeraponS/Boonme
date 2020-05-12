@@ -5,17 +5,13 @@ import {
   CardStyleInterpolators,
 } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import FirstPage from "../Screens/FirstPage";
-import SignIn from "../Screens/SignIn";
-import SignUp from "../Screens/SignUp";
-import Forgot from "../Screens/Forgot";
+
 import PinCreate from "../Screens/PinCreate";
 import NameCreate from "../Screens/NameCreate";
 
 const Stack = createStackNavigator();
 
-function UserAuthen() {
+function GetInfo() {
   return (
     <Stack.Navigator
       initialRouteName="FirstPage"
@@ -26,14 +22,12 @@ function UserAuthen() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="FirstPage" component={FirstPage} />
-      <Stack.Screen name="SignIn" component={SignIn} />
-      <Stack.Screen name="SignUp" component={SignUp} />
-      <Stack.Screen name="Forgot" component={Forgot} />
+      <Stack.Screen name="NameCreate" component={NameCreate} />
+      <Stack.Screen name="PinCreate" component={PinCreate} />
     </Stack.Navigator>
   );
 }
 
 export default () => {
-  return <UserAuthen />;
+  return <GetInfo />;
 };

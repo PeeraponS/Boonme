@@ -21,7 +21,7 @@ import {
   CardStyleInterpolators,
 } from "@react-navigation/stack";
 
-import Explore from "../Screens/Explore";
+import ExploreStack from "../Navigation/ExploreStack";
 import Feed from "../Screens/Feed";
 import Campaign from "../Screens/Campaign";
 import Wallet from "../Screens/Wallet";
@@ -39,28 +39,12 @@ const Screen = ({ navigation, style }) => {
       <Stack.Navigator
         screenOptions={{
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, //Transition Animation <3
-          headerTransparent: true,
-          // headerTitle: null,
-          headerTitleStyle: {
-            color: "black",
-            marginTop: 15,
-            fontFamily: "NOTO_M",
-            left: 3,
-          },
-          headerTitleAlign: ["center"],
-          headerLeft: () => (
-            <Ionicons
-              name="ios-menu"
-              // color="white"
-              size={30}
-              style={{ margin: 14, marginTop: 25, marginLeft: 15 }}
-              onPress={() => navigation.openDrawer()}
-            />
-          ),
+          headerShown: false,
+          headerTitle: null,
         }}
         animation="fade"
       >
-        <Stack.Screen name="Explore" component={Explore} />
+        <Stack.Screen name="ExploreStack" component={ExploreStack} />
         <Stack.Screen name="Feed" component={Feed} />
         <Stack.Screen name="Campaign" component={Campaign} />
         <Stack.Screen name="Wallet" component={Wallet} />
@@ -72,7 +56,7 @@ const Screen = ({ navigation, style }) => {
 
 const DrawerContent = (props) => {
   const userName = useSelector((state) => state.user.name);
-
+  const userCoin = useSelector((state) => state.user.amountCoin);
   const RemoveDataFromStorage = (token, userId) => {
     AsyncStorage.removeItem("userData");
   };
@@ -82,7 +66,6 @@ const DrawerContent = (props) => {
       <View
         style={{
           padding: 16,
-          // backgroundColor: "red",
           height: 230,
         }}
       >
@@ -92,12 +75,12 @@ const DrawerContent = (props) => {
             marginLeft: 0,
             width: 60,
             height: 60,
-            backgroundColor: "#ffd30d",
+            backgroundColor: "#1b262c",
             borderRadius: 30,
           }}
         ></View>
         <TX_R style={{ marginTop: 20, fontSize: 15 }}>{userName}</TX_R>
-        <TX_R style={{ fontSize: 12 }}>Engineer</TX_R>
+        <TX_R style={{ fontSize: 12 }}>{userCoin} เหรียญบุญมี </TX_R>
       </View>
       <View style={{ paddingTop: "10%" }}>
         <DrawerItem
@@ -115,7 +98,7 @@ const DrawerContent = (props) => {
           icon={() => <AntDesign name="flag" size={24} style={{ width: 30 }} />}
         />
         <DrawerItem
-          label="ฟีด"
+          label="อัปเดต"
           labelStyle={{ marginLeft: -16, fontFamily: "NOTO_M" }}
           onPress={() => props.navigation.navigate("Feed")}
           icon={() => (
@@ -123,7 +106,7 @@ const DrawerContent = (props) => {
           )}
         />
         <DrawerItem
-          label="กระเป๋า"
+          label="วอลเล็ท"
           labelStyle={{ marginLeft: -16, fontFamily: "NOTO_M" }}
           onPress={() => props.navigation.navigate("Wallet")}
           icon={() => (
@@ -171,7 +154,7 @@ export default () => {
   });
   const elevation = Animated.interpolate(progress, {
     inputRange: [0, 1],
-    outputRange: [0, 30],
+    outputRange: [0, 16],
   });
 
   const animatedStyle = { elevation, borderRadius, transform: [{ scale }] };
@@ -182,13 +165,14 @@ export default () => {
       drawerType="slide"
       overlayColor="transparent"
       initialRouteName="Explore"
+      backBehavior="none"
       drawerStyle={styles.drawerStyles}
       contentContainerStyle={{ flex: 1 }}
       drawerContent={(props) => {
         setProgress(props.progress);
         return <DrawerContent {...props} />;
       }}
-      sceneContainerStyle={{ backgroundColor: "white" }}
+      sceneContainerStyle={{ backgroundColor: "#fafafa" }}
     >
       <Drawer.Screen name="Screen">
         {(props) => <Screen {...props} style={animatedStyle} />}
@@ -201,5 +185,5 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: "hidden",
   },
-  drawerStyles: { flex: 1, width: "45%", backgroundColor: "white" },
+  drawerStyles: { flex: 1, width: "45%", backgroundColor: "#fafafa" },
 });
