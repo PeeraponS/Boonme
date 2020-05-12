@@ -44,6 +44,7 @@ router.get("/projects/random/:size", async (req, res) => {
   try {
     // get all projects
     const random_projects = await Project.aggregate([
+      { $match: { is_completed: false } },
       { $sample: { size: Number(req.params.size) } },
     ]);
 
