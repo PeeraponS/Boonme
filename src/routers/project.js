@@ -30,7 +30,6 @@ router.get("/projects/:projectId/creator", auth, async (req, res) => {
 
     // search creator
     const creator = await User.findById(project.creator.toString());
-    console.log(creator);
     res.status(201).send(creator);
   } catch (error) {
     res.status(400).send(error);
@@ -110,6 +109,10 @@ router.get("/projects/donation_almost_max", async (req, res) => {
       let project = projects_db[i].toObject();
       project["maxdonate_realdonate_diff"] =
         project["max_donation_amount"] - project["donation_amount"];
+      project["maxdonate_realdonate_diff_percent"] =
+        (project["maxdonate_realdonate_diff"] /
+          project["max_donation_amount"]) *
+        100;
 
       // filtered only not expired campaign and isn't completed
       if (
@@ -121,7 +124,9 @@ router.get("/projects/donation_almost_max", async (req, res) => {
 
     // Sort
     donation_almost_max_projects.sort(
-      (a, b) => a.maxdonate_realdonate_diff - b.maxdonate_realdonate_diff
+      (a, b) =>
+        a.maxdonate_realdonate_diff_percent -
+        b.maxdonate_realdonate_diff_percent
     );
 
     res.send(donation_almost_max_projects);
