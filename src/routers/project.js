@@ -1,6 +1,7 @@
 const express = require("express");
 const router = new express.Router();
 const Project = require("../models/project");
+const User = require("../models/user");
 const auth = require("../middleWare/auth");
 
 const { checkBalance } = require("../../connectBlockchain/Mytoken");
@@ -21,12 +22,30 @@ router.post("/projects", auth, async (req, res) => {
   }
 });
 
+// Get campaign creator
+router.get("/projects/:projectId/creator", auth, async (req, res) => {
+  try {
+    // search project
+    const project = await Project.findById(req.params.projectId);
+
+    // search creator
+    const creator = await User.findById(project.creator.toString());
+    console.log(creator);
+    res.status(201).send(creator);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 // GET /projects/?complete=true
 // GET /projects/?project_type=project_type
 router.get("/projects", async (req, res) => {
-  let query = {};
+  let query = {
+    is_completed: req.query.complete ? true : false,
+  };
   if (req.query.project_type) {
     query = {
+      ...query,
       project_type: req.query.project_type,
     };
   }
