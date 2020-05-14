@@ -51,6 +51,7 @@ router.get("/projects", async (req, res) => {
 
   try {
     const projects = await Project.find(query);
+
     res.send(projects);
   } catch (error) {
     res.status(500).send(error);
@@ -208,10 +209,10 @@ router.get("/projects/favourite", auth, async (req, res) => {
   }
 });
 
-router.get("/projects/:id", auth, async (req, res) => {
+router.get("/projects/:projectId", auth, async (req, res) => {
   const _id = req.params.id;
   try {
-    const project = await Project.findOne({ _id, creator: req.user._id });
+    const project = await Project.findById(req.params.projectId);
 
     return !project ? res.status(404).send() : res.status(200).send(project);
   } catch (error) {
