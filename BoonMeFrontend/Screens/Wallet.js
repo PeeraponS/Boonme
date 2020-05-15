@@ -33,6 +33,8 @@ const Wallet = (props) => {
   const [text, setText] = useState("");
   const userPin = useSelector((state) => state.user.userpin);
   const userToken = useSelector((state) => state.user.token);
+  const userName = useSelector((state) => state.user.name);
+  const userCash = useSelector((state) => state.user.amountCash);
 
   const _checkCode = async (code) => {
     const encryptedCode_Mockup = await sha256.x2(userPin);
@@ -47,13 +49,14 @@ const Wallet = (props) => {
       console.log("laoded");
       setText("");
       setVisible(false);
-      refreshUserInfo();
+      refreshUserCoin();
+
       setCode();
     }
   };
 
   const buyGoodcoin = async () => {
-    let url = `https://limitless-taiga-70780.herokuapp.com/users/me/depositcash`;
+    let url = `https://limitless-taiga-70780.herokuapp.com/erc20token/buytoken`;
     let Authorization = `Bearer ${userToken}`;
     console.log(Authorization);
     try {
@@ -61,21 +64,45 @@ const Wallet = (props) => {
         method: "post",
         url,
         data: {
-          deposit: Number(amount),
+          value: Number(amount),
         },
         headers: {
           Authorization,
         },
       });
-
+      refreshUserInfo();
       console.log(amount);
     } catch (err) {
       console.log(err);
     }
   };
 
+  const GETCOIN = "GETCOIN";
   const LOGIN = "LOGIN";
   const dispatch = useDispatch();
+  const refreshUserCoin = async () => {
+    let url = `https://limitless-taiga-70780.herokuapp.com/erc20token/checkbalance`;
+    let Authorization = `Bearer ${userToken}`;
+
+    try {
+      const result = await axios({
+        method: "get",
+        url,
+        headers: {
+          Authorization,
+        },
+      });
+
+      dispatch({
+        type: GETCOIN,
+        coinData: result.data,
+      });
+    } catch (err) {
+      console.log("refreshUserCoin err");
+      console.log(err);
+    }
+  };
+
   const refreshUserInfo = async () => {
     let url = `https://limitless-taiga-70780.herokuapp.com/users/me`;
     let Authorization = `Bearer ${userToken}`;
@@ -94,7 +121,7 @@ const Wallet = (props) => {
         userData: result.data,
       });
     } catch (err) {
-      console.log("err");
+      console.log("refreshUserInfo err");
       console.log(err);
     }
   };
@@ -130,6 +157,7 @@ const Wallet = (props) => {
   const { width } = Dimensions.get("window");
 
   const userCoin = useSelector((state) => state.user.amountCoin);
+  const coinAddress = useSelector((state) => state.user.userAddress);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white", alignItems: "center" }}>
@@ -182,7 +210,7 @@ const Wallet = (props) => {
             />
           </TouchableWithoutFeedback>
           <View>
-            <TX_R style={{ fontSize: 26 }}>เติมเหรียญ</TX_R>
+            <TX_R style={{ fontSize: 26 }}>ซื้อเหรียญ</TX_R>
           </View>
         </View>
         <ScrollView
@@ -259,8 +287,43 @@ const Wallet = (props) => {
                   borderRadius: 12,
                   backgroundColor: "#eee",
                   marginTop: 20,
+                  alignItems: "center",
                 }}
-              ></View>
+              >
+                <View
+                  style={{
+                    width: "94%",
+                    height: 80,
+                    borderRadius: 12,
+                    backgroundColor: "#fff",
+                    elevation: 4,
+                    marginTop: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    paddingHorizontal: 10,
+                  }}
+                >
+                  <View style={{ padding: 10, paddingTop: 10 }}>
+                    <TX_R style={{ fontSize: 20 }}>{userName}</TX_R>
+                    <TX_R style={{ fontSize: 14 }}>Boonme Visual Card</TX_R>
+                  </View>
+
+                  <View
+                    style={{
+                      padding: 10,
+                      paddingTop: 10,
+                      flexDirection: "row",
+                      alignItems: "flex-end",
+                    }}
+                  >
+                    <TX_R style={{ fontSize: 28, marginRight: 10 }}>
+                      {userCash}
+                    </TX_R>
+                    <TX_R style={{ fontSize: 14, bottom: 5 }}>บาท</TX_R>
+                  </View>
+                </View>
+              </View>
               <View
                 style={{
                   flexDirection: "row",
@@ -392,11 +455,14 @@ const Wallet = (props) => {
           alignItems: "center",
           elevation: 1,
           backgroundColor: "#fff",
-          paddingBottom: 10,
+          paddingBottom: 0,
         }}
       >
         <TX_B style={{ fontSize: 28 }}>{userCoin}</TX_B>
         <TX_R style={{ color: "#007AFF" }}>เหรียญบุญมี</TX_R>
+        <TX_R style={{ fontSize: 12, marginTop: 10 }}>
+          address: {coinAddress}
+        </TX_R>
       </View>
 
       <View
@@ -425,10 +491,14 @@ const Wallet = (props) => {
                 size={24}
                 style={{ marginBottom: 10, marginTop: 3 }}
               />
-              <TX_R>เติมเหรียญ</TX_R>
+              <TX_R>ซื้อเหรียญ</TX_R>
             </View>
           </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={() => {}}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              props.navigation.navigate("Card");
+            }}
+          >
             <View style={styles.box}>
               <SimpleLineIcons
                 name="credit-card"

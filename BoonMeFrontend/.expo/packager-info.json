@@ -1,10 +1,10 @@
 {
-  "expoServerPort": 19000,
-  "packagerPort": 19001,
-  "packagerPid": 9832,
-  "expoServerNgrokUrl": "https://r7-aww.anonymous.boonmefrontend.exp.direct",
-  "packagerNgrokUrl": "https://packager.r7-aww.anonymous.boonmefrontend.exp.direct",
-  "ngrokPid": 11128,
+  "expoServerPort": null,
+  "packagerPort": null,
+  "packagerPid": null,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null,
   "devToolsPort": 19002,
   "webpackServerPort": null
 }

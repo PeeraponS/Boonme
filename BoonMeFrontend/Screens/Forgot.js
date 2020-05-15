@@ -80,7 +80,7 @@ export default function Forgot(props) {
           </View>
 
           <LinearGradient
-            colors={["#40c9ff", "#4a40ff"]}
+            colors={["#007AFF", "#007AFF"]}
             start={[1, -1.2]}
             style={{
               width: "80%",

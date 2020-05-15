@@ -6,6 +6,7 @@ import TX_R from "../Components/TX_R";
 
 import axios from "axios";
 
+const LOGIN = "LOGIN";
 export default PinCreate = (props) => {
   const [code, setCode] = useState();
   const [text, setText] = useState("");

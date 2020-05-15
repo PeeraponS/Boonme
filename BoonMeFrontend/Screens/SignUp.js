@@ -157,7 +157,7 @@ export default function SignUp(props) {
             }}
           >
             <LinearGradient
-              colors={["#40c9ff", "#4a40ff"]}
+              colors={["#007AFF", "#007AFF"]}
               start={[1, -1.2]}
               style={styles.button}
             >

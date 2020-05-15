@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   // TouchableWithoutFeedback,
@@ -18,21 +18,18 @@ import {
   TouchableHighlight,
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 const CampaignDetails = (props) => {
   const scrollY = new Animated.Value(0);
-  const animTop = scrollY.interpolate({
-    inputRange: [0, 240],
-    outputRange: [240, 0],
-    extrapolate: "clamp",
-  });
   const animOpacity = scrollY.interpolate({
     inputRange: [0, 239.9, 240],
     outputRange: [0, 0, 1],
     extrapolate: "clamp",
   });
 
-  const { width, height } = Dimensions.get("screen");
+  const { width } = Dimensions.get("window");
   const ProgressWidth = width - 40;
 
   const imgHeight = 240;
@@ -43,12 +40,15 @@ const CampaignDetails = (props) => {
     setScreenHeight(x);
   };
 
+  //FollowBtn
   const [isFav, setisFav] = useState(false);
   const FavButton = () => {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          setisFav((Value) => !Value);
+          // setisFav((Value) => !Value);
+          // FavPress();
+          FollowMedthod();
         }}
       >
         {isFav ? (
@@ -102,6 +102,85 @@ const CampaignDetails = (props) => {
     );
   };
 
+  const userToken = useSelector((state) => state.user.token);
+
+  const FavCheck = async () => {
+    const projectId = props.route.params.item._id;
+    let url = `https://limitless-taiga-70780.herokuapp.com/projects/${projectId}/favourite`;
+    let Authorization = `Bearer ${userToken}`;
+    try {
+      const result = await axios({
+        method: "get",
+        url,
+        data: {},
+        headers: {
+          Authorization,
+        },
+      });
+      setisFav(result.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const FavPress = async () => {
+    const userId = props.route.params.item._id;
+    let url = `https://limitless-taiga-70780.herokuapp.com/projects/${userId}/favourite`;
+    let Authorization = `Bearer ${userToken}`;
+    try {
+      const result = await axios({
+        method: "patch",
+        url,
+        data: {},
+        headers: {
+          Authorization,
+        },
+      });
+      setisFav(result.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // const [Creator, setCreator] = useState();
+  // const getCreator = async () => {
+  //   const userId = props.route.params.item._id;
+  //   let url = `https://limitless-taiga-70780.herokuapp.com/projects/${userId}/creator`;
+  //   let Authorization = `Bearer ${userToken}`;
+  //   const result = await axios({
+  //     url,
+  //     headers: {
+  //       Authorization,
+  //     },
+  //   });
+  //   // console.log(result.data.name);
+  //   setCreator(result.data.name);
+  // };
+
+  //pressFollow
+  const FollowMedthod = () => {
+    setisFav((Value) => !Value);
+    FavPress();
+  };
+
+  //CalPercent
+  const amount = props.route.params.item.donation_amount;
+  const max = props.route.params.item.max_donation_amount;
+  const percent = (amount * 100) / max;
+  const lengthBar = percent / 100;
+
+  //Run Funtion
+  useEffect(() => {
+    // LoadDataProject();
+    FavCheck();
+    // getCreator();
+  }, []);
+
+  const endDate = new Date(props.route.params.item.due_date);
+  const date = new Date();
+  const difDate = endDate - date;
+  const difDay = difDate / 1000 / 60 / 60 / 24;
+
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <StatusBar
@@ -111,7 +190,7 @@ const CampaignDetails = (props) => {
       />
       <View>
         <Image
-          source={{ uri: props.route.params.imgUrl }}
+          source={{ uri: props.route.params.item.img }}
           style={{
             width: "100%",
             height: imgHeight,
@@ -139,7 +218,7 @@ const CampaignDetails = (props) => {
       >
         <TouchableWithoutFeedback
           onPress={() => {
-            props.navigation.navigate("Explore");
+            props.navigation.goBack();
           }}
         >
           <Ionicons
@@ -193,7 +272,7 @@ const CampaignDetails = (props) => {
           >
             <TouchableWithoutFeedback
               onPress={() => {
-                props.navigation.navigate("Explore");
+                props.navigation.goBack();
               }}
             >
               <Ionicons
@@ -227,7 +306,9 @@ const CampaignDetails = (props) => {
                 marginTop: 15,
               }}
             >
-              <TX_R style={{ fontSize: 20 }}>{props.route.params.title}</TX_R>
+              <TX_R style={{ fontSize: 20 }}>
+                {props.route.params.item.name}
+              </TX_R>
             </View>
             <View
               style={{
@@ -249,8 +330,22 @@ const CampaignDetails = (props) => {
                     height: 40,
                     backgroundColor: "#eee",
                     borderRadius: 20,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
                   }}
-                ></View>
+                >
+                  <Image
+                    source={require("../assets/Logo.png")}
+                    style={{
+                      width: 55,
+                      height: 55,
+                      // backgroundColor: "#1b262c",
+                      borderRadius: 30,
+                      resizeMode: "cover",
+                    }}
+                  />
+                </View>
                 <View
                   style={{
                     height: 40,
@@ -258,9 +353,11 @@ const CampaignDetails = (props) => {
                     justifyContent: "center",
                   }}
                 >
-                  <TX_R style={{ fontSize: 14 }}>จาก มูลนิธิ A</TX_R>
+                  <TX_R style={{ fontSize: 14 }}>
+                    โครงการโดย {props.route.params.item.creatorname}
+                  </TX_R>
                   <TX_R style={{ fontSize: 12 }}>
-                    เผยแพร่วันที่ 16 / 03 / 2020
+                    เผยแพร่วันที่ 16 / 03 / 2563
                   </TX_R>
                 </View>
               </View>
@@ -274,8 +371,9 @@ const CampaignDetails = (props) => {
               <TX_R style={{ fontSize: 14, marginBottom: 5 }}>
                 อธิบายโครงการ
               </TX_R>
-              <TX_R style={{ fontSize: 14 }}>{props.route.params.desc}</TX_R>
-              <TX_R style={{ fontSize: 14 }}>{props.route.params.desc}</TX_R>
+              <TX_R style={{ fontSize: 14 }}>
+                {props.route.params.item.description}
+              </TX_R>
             </View>
           </View>
           <View
@@ -301,7 +399,9 @@ const CampaignDetails = (props) => {
                   alignItems: "center",
                 }}
               >
-                <TX_R style={{ fontSize: 24 }}>115 คน</TX_R>
+                <TX_R style={{ fontSize: 24 }}>
+                  {props.route.params.item.followers.length} คน
+                </TX_R>
                 <TX_R style={{ fontSize: 12 }}>ติดตามโครงการนี้</TX_R>
               </View>
               <View
@@ -311,8 +411,11 @@ const CampaignDetails = (props) => {
                 }}
               >
                 <TX_R style={{ fontSize: 12 }}>ยอดบริจาค</TX_R>
-                <TX_R style={{ fontSize: 24 }}>38%</TX_R>
-                <TX_R style={{ fontSize: 12 }}>7600 / 20000</TX_R>
+                <TX_R style={{ fontSize: 24 }}>{percent.toFixed(2)}%</TX_R>
+                <TX_R style={{ fontSize: 12 }}>
+                  {props.route.params.item.donation_amount}/
+                  {props.route.params.item.max_donation_amount}
+                </TX_R>
               </View>
               <View
                 style={{
@@ -320,9 +423,9 @@ const CampaignDetails = (props) => {
                   alignItems: "center",
                 }}
               >
-                <TX_R style={{ fontSize: 24 }}>132 ชม.</TX_R>
+                <TX_R style={{ fontSize: 24 }}>{difDay.toFixed()} วัน</TX_R>
                 <TX_R style={{ fontSize: 12 }}>โครงการจะสิ้นสุด</TX_R>
-                <TX_R style={{ fontSize: 12 }}>17/04/53 13.00</TX_R>
+                <TX_R style={{ fontSize: 12 }}>17/09/63 13.00</TX_R>
               </View>
             </View>
             <View
@@ -336,7 +439,7 @@ const CampaignDetails = (props) => {
                 alignContent: "center",
               }}
             >
-              <Progress.Bar progress={0.38} width={ProgressWidth} />
+              <Progress.Bar progress={lengthBar} width={ProgressWidth} />
             </View>
 
             <View
@@ -353,7 +456,9 @@ const CampaignDetails = (props) => {
             >
               <TouchableWithoutFeedback
                 onPress={() => {
-                  props.navigation.navigate("Donate");
+                  props.navigation.navigate("Donate", {
+                    item: props.route.params.item,
+                  });
                 }}
               >
                 <LinearGradient
@@ -376,7 +481,7 @@ const CampaignDetails = (props) => {
             <View>
               <TouchableHighlight
                 onPress={() => {
-                  props.navigation.navigate("Comment");
+                  props.navigation.navigate("Requirement");
                 }}
               >
                 <View style={styles.box}>
@@ -385,7 +490,7 @@ const CampaignDetails = (props) => {
               </TouchableHighlight>
               <TouchableHighlight
                 onPress={() => {
-                  props.navigation.navigate("Comment");
+                  props.navigation.navigate("Update");
                 }}
               >
                 <View style={styles.box}>

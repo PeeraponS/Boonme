@@ -9,12 +9,13 @@ import {
   Dimensions,
   StatusBar,
   StyleSheet,
+  RefreshControl,
 } from "react-native";
 import { getStatusBarHeight } from "react-native-status-bar-height";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
-
+import { useSelector, useDispatch } from "react-redux";
 import TX_R from "../Components/TX_R";
 import TX_L from "../Components/TX_L";
 import TX_M from "../Components/TX_M";
@@ -23,17 +24,23 @@ import TX_B from "../Components/TX_B";
 import CategoryData from "../Data/Category";
 
 const Explore = (props) => {
-  function Card({ title, imgUrl, desc, onCardClicked }) {
+  const userToken = useSelector((state) => state.user.token);
+
+  function Card({ item, onCardClicked }) {
+    const amount = item.donation_amount;
+    const max = item.max_donation_amount;
+    const percent = (amount * 100) / max;
+
     return (
-      <TouchableWithoutFeedback onPress={onCardClicked}>
-        <View
-          style={{
-            width: width,
-            height: 240,
-            // paddingTop: 10,
-            alignItems: "center",
-          }}
-        >
+      <View
+        style={{
+          width: width,
+          height: 240,
+          // paddingTop: 10,
+          alignItems: "center",
+        }}
+      >
+        <TouchableWithoutFeedback onPress={onCardClicked}>
           <View
             style={{
               width: "100%",
@@ -63,39 +70,49 @@ const Explore = (props) => {
                     color: "#fff",
                   }}
                 >
-                  หมวดการศึกษา
+                  หมวด{item.project_type}
                 </TX_R>
               </View>
               <View>
-                <TX_R style={{ fontSize: 34, color: "#fff" }}>38%</TX_R>
+                <TX_R style={{ fontSize: 34, color: "#fff" }}>
+                  {percent.toFixed(2)}%
+                </TX_R>
               </View>
               <View>
-                <TX_R style={{ fontSize: 20, color: "#fff" }}>{title}</TX_R>
-                <TX_R style={{ fontSize: 14, color: "#fff" }}>
-                  โดย มูลนิธิ A
+                <TX_R style={{ fontSize: 18, color: "#fff" }}>{item.name}</TX_R>
+                <TX_R style={{ fontSize: 12, color: "#fff" }}>
+                  โครงการโดย {item.creatorname}
                 </TX_R>
               </View>
             </LinearGradient>
             <Image
-              source={{ uri: imgUrl }}
+              source={{ uri: item.img }}
               style={{
                 width: "100%",
                 height: "100%",
               }}
             />
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </View>
     );
   }
 
-  function ExpiresoonCard({ title, imgUrl, desc, onCardClicked }) {
+  function ExpiresoonCard({ item, onCardClicked }) {
+    const amount = item.donation_amount;
+    const max = item.max_donation_amount;
+    const percent = (amount * 100) / max;
+
+    const endDate = new Date(item.due_date);
+    const date = new Date();
+    const difDate = endDate - date;
+    const difDay = difDate / 1000 / 60 / 60 / 24;
     return (
       <TouchableWithoutFeedback onPress={onCardClicked}>
         <View
           style={{
             width: 260,
-            height: 120,
+            height: 170,
             backgroundColor: "#eee",
             borderRadius: 15,
             marginTop: 10,
@@ -119,18 +136,27 @@ const Explore = (props) => {
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
-              <TX_R style={{ fontSize: 16, color: "#fff" }}>
-                ปิดโครงการ 34 ชม.
+              <View>
+                <TX_R style={{ fontSize: 24, color: "#fff", top: -2 }}>
+                  {percent.toFixed(2)}%
+                </TX_R>
+                <TX_R></TX_R>
+              </View>
+              <TX_R style={{ fontSize: 14, color: "#fff" }}>
+                ปิดโครงการ {difDay.toFixed()} วัน
               </TX_R>
-              <TX_R style={{ fontSize: 16, color: "#fff" }}>26%</TX_R>
             </View>
-            <View>
-              <TX_R style={{ fontSize: 20, color: "#fff" }}>{title}</TX_R>
-              <TX_R style={{ fontSize: 14, color: "#fff" }}>โดย มูลนิธิ A</TX_R>
+            <View styles={{}}>
+              <TX_R style={{ fontSize: 18, color: "#fff", paddingBottom: 5 }}>
+                {item.name}
+              </TX_R>
+              <TX_R style={{ fontSize: 12, color: "#fff" }}>
+                โครงการโดย {item.creatorname}
+              </TX_R>
             </View>
           </LinearGradient>
           <Image
-            source={{ uri: imgUrl }}
+            source={{ uri: item.img }}
             style={{
               width: "100%",
               height: "100%",
@@ -141,7 +167,7 @@ const Explore = (props) => {
     );
   }
 
-  function Category({ name, title, goToCampaign }) {
+  function Category({ name, title, goToCampaign, item }) {
     return (
       <TouchableWithoutFeedback onPress={goToCampaign}>
         <View
@@ -196,25 +222,181 @@ const Explore = (props) => {
 
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
+  const [data3, setData3] = useState([]);
 
-  const loadData = async () => {
+  // const loadData = async () => {
+  //   const result = await axios(
+  //     "https://limitless-taiga-70780.herokuapp.com/projects/random/5"
+  //   );
+  //   setData(result.data);
+  //   // console.log(result.data);
+  // };
+  // const LaadData2 = async () => {
+  //   const result = await axios(
+  //     "https://limitless-taiga-70780.herokuapp.com/projects/expiresoon"
+  //   );
+  //   setData2(result.data);
+  // };
+  // const LaadData3 = async () => {
+  //   const result = await axios(
+  //     "https://limitless-taiga-70780.herokuapp.com/projects/donation_almost_max"
+  //   );
+  //   setData3(result.data);
+  // };
+
+  const [isLoading, setisLoading] = useState(false);
+
+  const getCreator1 = async () => {
     const result = await axios(
-      "https://limitless-taiga-70780.herokuapp.com/projects"
+      "https://limitless-taiga-70780.herokuapp.com/projects/random/5"
     );
-    setData(result.data);
-    console.log(result.data);
+
+    const data = result.data;
+
+    let updatedProject = [];
+    let promises = [];
+    let Authorization = `Bearer ${userToken}`;
+
+    for (let index = 0; index < data.length; index++) {
+      let url = `https://limitless-taiga-70780.herokuapp.com/projects/${data[index]._id}/creator`;
+
+      promises.push(
+        axios({
+          url,
+          headers: {
+            Authorization,
+          },
+        }).then((res) => {
+          data[index].creatorname = res.data.name;
+          updatedProject.push(data[index]);
+        })
+      );
+
+      // console.log(data[index]._id);
+    }
+    return Promise.all(promises).then(() => {
+      // console.log(updatedProject);
+      setData(updatedProject);
+    });
   };
-  const LaadData2 = async () => {
+
+  const getCreator2 = async () => {
     const result = await axios(
       "https://limitless-taiga-70780.herokuapp.com/projects/expiresoon"
     );
-    setData2(result.data);
+
+    const data = result.data;
+
+    let updatedProject = [];
+    let promises = [];
+    let Authorization = `Bearer ${userToken}`;
+
+    for (let index = 0; index < data.length; index++) {
+      let url = `https://limitless-taiga-70780.herokuapp.com/projects/${data[index]._id}/creator`;
+
+      promises.push(
+        axios({
+          url,
+          headers: {
+            Authorization,
+          },
+        }).then((res) => {
+          data[index].creatorname = res.data.name;
+          updatedProject.push(data[index]);
+        })
+      );
+
+      // console.log(data[index]._id);
+    }
+    return Promise.all(promises).then(() => {
+      // console.log(updatedProject);
+      setData2(updatedProject);
+    });
+  };
+
+  const getCreator3 = async () => {
+    const result = await axios(
+      "https://limitless-taiga-70780.herokuapp.com/projects/donation_almost_max"
+    );
+
+    const data = result.data;
+
+    let updatedProject = [];
+    let promises = [];
+    let Authorization = `Bearer ${userToken}`;
+
+    for (let index = 0; index < data.length; index++) {
+      let url = `https://limitless-taiga-70780.herokuapp.com/projects/${data[index]._id}/creator`;
+
+      promises.push(
+        axios({
+          url,
+          headers: {
+            Authorization,
+          },
+        }).then((res) => {
+          data[index].creatorname = res.data.name;
+          updatedProject.push(data[index]);
+        })
+      );
+
+      // console.log(data[index]._id);
+    }
+    return Promise.all(promises).then(() => {
+      // console.log(updatedProject);
+      setData3(updatedProject);
+    });
+  };
+  const dispatch = useDispatch();
+  const GETCOIN = "GETCOIN";
+  const loadCoinData = async () => {
+    let url = `https://limitless-taiga-70780.herokuapp.com/erc20token/checkbalance`;
+    let Authorization = `Bearer ${userToken}`;
+    const result = await axios({
+      url,
+      headers: {
+        Authorization,
+      },
+    });
+    // console.log(result.data);
+    dispatch({
+      type: GETCOIN,
+      coinData: result.data,
+    });
   };
 
   useEffect(() => {
-    loadData();
-    LaadData2();
+    setisLoading(true);
+    loadCoinData();
+    getCreator1();
+    getCreator2();
+    getCreator3();
+    setisLoading(false);
   }, []);
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    refreshUserInfo();
+    console.log("onRefresh");
+    wait(2000).then(() => setRefreshing(false));
+  }, [refreshing]);
+
+  function wait(timeout) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, timeout);
+    });
+  }
+
+  const refreshUserInfo = async () => {
+    setisLoading(true);
+    loadCoinData();
+    getCreator1();
+    getCreator2();
+    getCreator3();
+    setisLoading(false);
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -259,8 +441,12 @@ const Explore = (props) => {
         bounces={false}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <Animated.FlatList
+          refreshing={isLoading}
           horizontal
           pagingEnabled
           // snapToInterval={300}
@@ -268,19 +454,15 @@ const Explore = (props) => {
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
           snapToAlignment="center"
-          data={data}
+          data={data ? data : []}
           renderItem={({ item }) => (
             <Card
               onCardClicked={() => {
                 props.navigation.navigate("CampaignDetails", {
-                  title: item.name,
-                  imgUrl: item.img,
-                  desc: item.description,
+                  item: item,
                 });
               }}
-              title={item.name}
-              imgUrl={item.img}
-              desc={item.description}
+              item={item}
             />
           )}
           keyExtractor={(item) => item._id}
@@ -311,6 +493,7 @@ const Explore = (props) => {
                 renderItem={({ item }) => (
                   <Category
                     title={item.title}
+                    item={item}
                     goToCampaign={() => {
                       props.navigation.navigate("Campaign", {
                         title: item.title,
@@ -325,7 +508,7 @@ const Explore = (props) => {
           </View>
           <View style={{ width: "100%", marginTop: 10 }}>
             <TX_R style={{ fontSize: 16, marginLeft: (4 * width) / 100 }}>
-              ใกล้สิ้นสุด
+              โครงการที่ใกล้จะสิ้นสุด
             </TX_R>
             <FlatList
               showsHorizontalScrollIndicator={false}
@@ -335,31 +518,44 @@ const Explore = (props) => {
                 <ExpiresoonCard
                   onCardClicked={() => {
                     props.navigation.navigate("CampaignDetails", {
-                      title: item.name,
-                      imgUrl: item.img,
-                      desc: item.description,
+                      item: item,
                     });
                   }}
-                  title={item.name}
-                  imgUrl={item.img}
-                  desc={item.description}
+                  item={item}
                 />
               )}
               keyExtractor={(item) => item._id}
             />
           </View>
-          <View style={{ width: "92%", marginTop: 20 }}>
-            <TX_R style={{ fontSize: 16 }}>ใกล้ครบยอด</TX_R>
-            <View style={styles.box}></View>
+          <View style={{ width: "100%", marginTop: 20 }}>
+            <TX_R style={{ fontSize: 16, marginLeft: (4 * width) / 100 }}>
+              โครงการที่ใกล้จะถึงเป้าหมาย
+            </TX_R>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              data={data3}
+              renderItem={({ item }) => (
+                <ExpiresoonCard
+                  onCardClicked={() => {
+                    props.navigation.navigate("CampaignDetails", {
+                      item: item,
+                    });
+                  }}
+                  item={item}
+                />
+              )}
+              keyExtractor={(item) => item._id}
+            />
           </View>
-          <View style={{ width: "92%", marginTop: 20 }}>
-            <TX_R style={{ fontSize: 16 }}>การอัปเดตล่าสุด</TX_R>
+          {/* <View style={{ width: "92%", marginTop: 20 }}>
+            <TX_R style={{ fontSize: 16 }}>ข่าวสารและการอัปเดต</TX_R>
             <View style={styles.box}></View>
           </View>
           <View style={{ width: "92%", marginTop: 20 }}>
             <TX_R style={{ fontSize: 16 }}>มูลนิธิ</TX_R>
             <View style={styles.box}></View>
-          </View>
+          </View> */}
         </View>
       </ScrollView>
     </View>

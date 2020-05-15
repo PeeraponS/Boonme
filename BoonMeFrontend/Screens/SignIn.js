@@ -20,6 +20,7 @@ import TX_B from "../Components/TX_B";
 import { Ionicons } from "@expo/vector-icons";
 
 const LOGIN = "LOGIN";
+const GETTOKEN = "GETTOKEN";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
@@ -47,11 +48,16 @@ export default function SignIn(props) {
           password: password,
         },
       });
+      console.log(result.data);
+      dispatch({
+        type: GETTOKEN,
+        token: result.data.token,
+      });
       dispatch({
         type: LOGIN,
         userData: result.data.user,
       });
-      console.log(result.data);
+      // console.log(result);
       SaveDataToStorage(result.data.token, result.data.user._id);
 
       setTextLoginBtn("เข้าสู่ระบบ");
@@ -161,7 +167,7 @@ export default function SignIn(props) {
             }}
           >
             <LinearGradient
-              colors={["#40c9ff", "#4a40ff"]}
+              colors={["#007AFF", "#007AFF"]}
               start={[1, -1.2]}
               style={styles.button}
             >

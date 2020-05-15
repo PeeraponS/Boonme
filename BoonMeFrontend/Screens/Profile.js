@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableWithoutFeedback, Modal } from "react-native";
+import { View, TouchableWithoutFeedback, Modal, Image } from "react-native";
 import { getStatusBarHeight } from "react-native-status-bar-height";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
@@ -7,6 +7,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import TX_R from "../Components/TX_R";
 import axios from "axios";
 import { useSelector } from "react-redux";
+
 const Profile = (props) => {
   const [visible, setVisible] = useState(false);
 
@@ -58,6 +59,8 @@ const Profile = (props) => {
       console.log(err.message);
     }
   };
+
+  const userName = useSelector((state) => state.user.name);
 
   return (
     <View style={{ flex: 1, alignItems: "center" }}>
@@ -168,10 +171,24 @@ const Profile = (props) => {
             marginTop: 5,
             borderWidth: 3,
             borderColor: "#007AFF",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
           }}
-        ></View>
+        >
+          <Image
+            source={require("../assets/Profile.png")}
+            style={{
+              width: 80,
+              height: 80,
+              // backgroundColor: "#1b262c",
+              borderRadius: 30,
+              resizeMode: "cover",
+            }}
+          />
+        </View>
         <View style={{ marginTop: 20 }}>
-          <TX_R style={{ fontSize: 16 }}>จอห์น โดว์</TX_R>
+          <TX_R style={{ fontSize: 16 }}>{userName}</TX_R>
         </View>
       </View>
 

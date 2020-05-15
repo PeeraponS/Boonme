@@ -43,7 +43,7 @@ function Dots() {
   return FirstPageImg.map((item, index) => {
     const colorDot = step.interpolate({
       inputRange: [index - 1, index, index + 1],
-      outputRange: ["#ccc", "#ff0055", "#ccc"],
+      outputRange: ["#1b262c", "#007AFF", "#1b262c"],
       extrapolate: "clamp",
     });
     const widthDot = step.interpolate({
@@ -131,7 +131,7 @@ export default function FirstPage(props) {
           }}
         >
           <LinearGradient
-            colors={["#40c9ff", "#4a40ff"]}
+            colors={["#007AFF", "#007AFF"]}
             start={[1, -1.2]}
             style={styles.button}
           >

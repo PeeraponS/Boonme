@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, AsyncStorage } from "react-native";
+import { View, Image, StyleSheet, AsyncStorage } from "react-native";
 import Animated, { color } from "react-native-reanimated";
 import { NavigationContainer } from "@react-navigation/native";
 
@@ -24,7 +24,7 @@ import {
 import ExploreStack from "../Navigation/ExploreStack";
 import Feed from "../Screens/Feed";
 import Campaign from "../Screens/Campaign";
-import Wallet from "../Screens/Wallet";
+import WalletStack from "../Navigation/WalletStack";
 import Profile from "../Screens/Profile";
 
 const Drawer = createDrawerNavigator();
@@ -47,7 +47,7 @@ const Screen = ({ navigation, style }) => {
         <Stack.Screen name="ExploreStack" component={ExploreStack} />
         <Stack.Screen name="Feed" component={Feed} />
         <Stack.Screen name="Campaign" component={Campaign} />
-        <Stack.Screen name="Wallet" component={Wallet} />
+        <Stack.Screen name="WalletStack" component={WalletStack} />
         <Stack.Screen name="Profile" component={Profile} />
       </Stack.Navigator>
     </Animated.View>
@@ -69,7 +69,7 @@ const DrawerContent = (props) => {
           height: 230,
         }}
       >
-        <View
+        {/* <View
           style={{
             marginTop: 70,
             marginLeft: 0,
@@ -78,9 +78,27 @@ const DrawerContent = (props) => {
             backgroundColor: "#1b262c",
             borderRadius: 30,
           }}
-        ></View>
-        <TX_R style={{ marginTop: 20, fontSize: 15 }}>{userName}</TX_R>
-        <TX_R style={{ fontSize: 12 }}>{userCoin} เหรียญบุญมี </TX_R>
+        ></View> */}
+
+        <Image
+          source={require("../assets/Profile.png")}
+          style={{
+            marginTop: 80,
+            marginLeft: 0,
+            width: 60,
+            height: 60,
+            // backgroundColor: "#1b262c",
+            borderRadius: 35,
+            resizeMode: "cover",
+            overflow: "hidden",
+            borderWidth: 3,
+            borderColor: "#007AFF",
+          }}
+        />
+        <TX_R style={{ marginTop: 10, fontSize: 15, color: "#007AFF" }}>
+          {userName}
+        </TX_R>
+        <TX_R style={{ fontSize: 12 }}>{userCoin} เหรียญบุญมี</TX_R>
       </View>
       <View style={{ paddingTop: "10%" }}>
         <DrawerItem
@@ -108,7 +126,7 @@ const DrawerContent = (props) => {
         <DrawerItem
           label="วอลเล็ท"
           labelStyle={{ marginLeft: -16, fontFamily: "NOTO_M" }}
-          onPress={() => props.navigation.navigate("Wallet")}
+          onPress={() => props.navigation.navigate("WalletStack")}
           icon={() => (
             <AntDesign name="wallet" size={24} style={{ width: 30 }} />
           )}

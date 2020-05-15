@@ -49,7 +49,11 @@ const StartUp = (props) => {
     });
 
     const result = await getUserByToken(token);
-
+    console.log(result.data);
+    // dispatch({
+    //   type: LOGIN,
+    //   userData: result.data.user,
+    // });
     dispatch({
       type: LOGIN,
       userData: result.data,
@@ -72,7 +76,7 @@ const StartUp = (props) => {
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
-        colors={["#40c9ff", "#4a40ff"]}
+        colors={["#007AFF", "#007AFF"]}
         start={[1, -1.2]}
         style={{
           width: "100%",
