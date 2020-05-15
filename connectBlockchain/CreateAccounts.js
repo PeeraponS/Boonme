@@ -22,7 +22,7 @@ const createAccount = async () => {
     gasPrice: web3.utils.toHex(gasPrice),
     gasLimit: web3.utils.toHex(gasLimit),
     to: recipient,
-    value: web3.utils.toHex(web3.utils.toWei("1", "Finney")),
+    value: web3.utils.toHex(web3.utils.toWei("3", "ether")),
     chainId: chainId,
   };
 

@@ -1,8 +1,7 @@
 const express = require("express");
 const router = new express.Router();
 const Project = require("../models/project");
-const Post = require("../models/post");
-const Comment = require("../models/comment");
+const User = require("../models/user");
 const auth = require("../middleWare/auth");
 
 const { checkBalance } = require("../../connectBlockchain/Mytoken");
@@ -23,20 +22,52 @@ router.post("/projects", auth, async (req, res) => {
   }
 });
 
+// Get campaign creator
+router.get("/projects/:projectId/creator", auth, async (req, res) => {
+  try {
+    // search project
+    const project = await Project.findById(req.params.projectId);
+
+    // search creator
+    const creator = await User.findById(project.creator.toString());
+    res.status(201).send(creator);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 // GET /projects/?complete=true
 // GET /projects/?project_type=project_type
 router.get("/projects", async (req, res) => {
-  // 50%, no filter
-  let query = {};
+  let query = {
+    is_completed: req.query.complete ? true : false,
+  };
   if (req.query.project_type) {
     query = {
+      ...query,
       project_type: req.query.project_type,
     };
   }
 
   try {
     const projects = await Project.find(query);
+
     res.send(projects);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// get random campaign
+router.get("/projects/random/:size", async (req, res) => {
+  try {
+    // get all projects
+    const random_projects = await Project.aggregate([
+      { $match: { is_completed: false } },
+      { $sample: { size: Number(req.params.size) } },
+    ]);
+
+    res.send(random_projects);
   } catch (error) {
     res.status(500).send(error);
   }
@@ -79,6 +110,10 @@ router.get("/projects/donation_almost_max", async (req, res) => {
       let project = projects_db[i].toObject();
       project["maxdonate_realdonate_diff"] =
         project["max_donation_amount"] - project["donation_amount"];
+      project["maxdonate_realdonate_diff_percent"] =
+        (project["maxdonate_realdonate_diff"] /
+          project["max_donation_amount"]) *
+        100;
 
       // filtered only not expired campaign and isn't completed
       if (
@@ -90,7 +125,9 @@ router.get("/projects/donation_almost_max", async (req, res) => {
 
     // Sort
     donation_almost_max_projects.sort(
-      (a, b) => a.maxdonate_realdonate_diff - b.maxdonate_realdonate_diff
+      (a, b) =>
+        a.maxdonate_realdonate_diff_percent -
+        b.maxdonate_realdonate_diff_percent
     );
 
     res.send(donation_almost_max_projects);
@@ -150,7 +187,6 @@ router.get("/projects/own", auth, async (req, res) => {
 });
 
 router.get("/projects/popular", async (req, res) => {
-  // 50%, no filter
   try {
     const projects = await Project.find({});
     res.send(projects);
@@ -173,10 +209,10 @@ router.get("/projects/favourite", auth, async (req, res) => {
   }
 });
 
-router.get("/projects/:id", auth, async (req, res) => {
+router.get("/projects/:projectId", auth, async (req, res) => {
   const _id = req.params.id;
   try {
-    const project = await Project.findOne({ _id, creator: req.user._id });
+    const project = await Project.findById(req.params.projectId);
 
     return !project ? res.status(404).send() : res.status(200).send(project);
   } catch (error) {
