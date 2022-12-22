@@ -22,7 +22,7 @@
     "dotenv": "^8.2.0",
     "ethereumjs-tx": "^2.1.2",
     "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.9.7",
     "multer": "^1.4.2",
     "sendgrid": "^5.2.3",
